@@ -105,9 +105,9 @@ export default function Home() {
                     <SelectValue placeholder="All statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="graduated">Graduated</SelectItem>
+                    <SelectItem value="all">All Members</SelectItem>
+                    <SelectItem value="active">Active Members</SelectItem>
+                    <SelectItem value="graduated">Graduated Members</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

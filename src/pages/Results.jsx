@@ -85,7 +85,7 @@ export default function Results() {
           <>
             {/* TOP 3 */}
             <div className="mb-10">
-              <h3 className="text-2xl font-bold text-center mb-6">🏆 Top 3</h3>
+              <h3 className="text-2xl font-bold text-center mb-6">My Top 3 Oshi 🏆</h3>
 
               <div className="flex justify-center gap-4 sm:gap-8">
                 {podium.map((m, i) => (

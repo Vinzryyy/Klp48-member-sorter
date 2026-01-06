@@ -159,7 +159,7 @@ export default function Sorter() {
 
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-emerald-600">
-              Choose the Better One
+              Choose One
             </h2>
             <p className="text-sm text-gray-600">
               {comparisons} comparisons • {progress}% complete
