@@ -81,7 +81,6 @@ export default function Sorter() {
     }
   }, [left, right, merged]);
 
-  /* ---------- EDGE CASE ---------- */
   if (members.length < 2) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg">
@@ -98,7 +97,6 @@ export default function Sorter() {
     );
   }
 
-  /* ---------- PROGRESS ---------- */
   const estimated = Math.ceil(members.length * Math.log2(members.length));
   const progress = Math.min(
     Math.round((comparisons / estimated) * 100),
@@ -109,55 +107,47 @@ export default function Sorter() {
   const R = right[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 sm:px-6 py-8 sm:py-10">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 py-8">
       <div className="max-w-6xl mx-auto">
 
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:justify-between sm:items-center mb-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/")}
-            className="w-full sm:w-auto"
-          >
+        <div className="flex flex-col gap-4 mb-8">
+          <Button variant="outline" onClick={() => navigate("/")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
 
           <div className="text-center">
-            <h1 className="text-xl sm:text-3xl font-bold text-emerald-600">
+            <h1 className="text-2xl sm:text-3xl font-bold text-emerald-600">
               Choose the Better One
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600">
+            <p className="text-sm text-gray-600">
               {comparisons} comparisons • {progress}% complete
             </p>
           </div>
 
-          <Button
-            variant="outline"
-            onClick={() => navigate("/")}
-            className="w-full sm:w-auto"
-          >
+          <Button variant="outline" onClick={() => navigate("/")}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Restart
           </Button>
         </div>
 
-        {/* COMPARISON */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-start lg:items-center">
+        {/* COMPARISON GRID */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
 
           {/* LEFT CARD */}
           <Card
             onClick={pickLeft}
-            className="cursor-pointer active:scale-[0.98] hover:scale-105 transition shadow-xl overflow-hidden"
+            className="order-1 lg:order-1 cursor-pointer hover:scale-105 transition shadow-xl overflow-hidden"
           >
             <img
               src={L.imageUrl}
               alt={L.name}
               className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover"
             />
-            <div className="p-3 sm:p-5 text-center">
-              <h3 className="text-base sm:text-xl font-bold">{L.name}</h3>
-              <p className="text-xs sm:text-sm text-gray-500">
+            <div className="p-4 text-center">
+              <h3 className="font-bold">{L.name}</h3>
+              <p className="text-xs text-gray-500">
                 Generation {L.generation}
               </p>
             </div>
@@ -166,28 +156,28 @@ export default function Sorter() {
           {/* RIGHT CARD */}
           <Card
             onClick={pickRight}
-            className="cursor-pointer active:scale-[0.98] hover:scale-105 transition shadow-xl overflow-hidden"
+            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-xl overflow-hidden"
           >
             <img
               src={R.imageUrl}
               alt={R.name}
               className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover"
             />
-            <div className="p-3 sm:p-5 text-center">
-              <h3 className="text-base sm:text-xl font-bold">{R.name}</h3>
-              <p className="text-xs sm:text-sm text-gray-500">
+            <div className="p-4 text-center">
+              <h3 className="font-bold">{R.name}</h3>
+              <p className="text-xs text-gray-500">
                 Generation {R.generation}
               </p>
             </div>
           </Card>
 
           {/* TIE BUTTON */}
-          <div className="col-span-2 lg:col-span-1 flex justify-center">
+          <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex items-center justify-center">
             <Button
               variant="outline"
               size="lg"
               onClick={pickTie}
-              className="w-full sm:w-2/3 lg:w-auto py-4 sm:py-6 text-sm sm:text-base"
+              className="w-full sm:w-2/3 lg:w-auto"
             >
               They are equal
             </Button>

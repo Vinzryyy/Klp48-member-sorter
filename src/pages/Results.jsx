@@ -19,14 +19,21 @@ export default function Results() {
     );
   }
 
-  /* ---------- TIERS ---------- */
-  const tierSize = Math.ceil(ranking.length / 5);
+  /* ================= TIER LOGIC (FIXED SIZE) ================= */
   const tiers = {
-    S: ranking.slice(0, tierSize),
-    A: ranking.slice(tierSize, tierSize * 2),
-    B: ranking.slice(tierSize * 2, tierSize * 3),
-    C: ranking.slice(tierSize * 3, tierSize * 4),
-    D: ranking.slice(tierSize * 4),
+    Oshimen: ranking.slice(0, 1),
+    "Niban-Oshi": ranking.slice(1, 3),
+    Oshisama: ranking.slice(3, 8),
+    Kikinarai: ranking.slice(8, 13),
+    Chikasashi: ranking.slice(13),
+  };
+
+  const tierColors = {
+    Oshimen: "bg-yellow-400 text-yellow-900",
+    "Niban-Oshi": "bg-emerald-500 text-white",
+    Oshisama: "bg-blue-500 text-white",
+    Kikinarai: "bg-gray-400 text-white",
+    Chikasashi: "bg-zinc-600 text-white",
   };
 
   const podium = ranking.slice(0, 3);
@@ -36,7 +43,7 @@ export default function Results() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 sm:px-6 py-8 sm:py-10">
       <div className="max-w-7xl mx-auto">
 
-        {/* HEADER */}
+        {/* ================= HEADER ================= */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
           <Button
             variant="outline"
@@ -72,19 +79,15 @@ export default function Results() {
         {/* ================= RANKING VIEW ================= */}
         {view === "ranking" && (
           <>
-            {/* 🏆 PODIUM (SAME SIZE) */}
+            {/* 🏆 TOP 3 */}
             <div className="mb-10">
-              <h2 className="text-2xl font-bold text-center mb-6">
-                🏆 Top 3
-              </h2>
+              <h2 className="text-2xl font-bold text-center mb-6">🏆 Top 3</h2>
 
               <div className="flex justify-center gap-4 sm:gap-8">
                 {podium.map((m, i) => (
                   <Card
                     key={m.id}
-                    className={`
-                      w-40 sm:w-44 overflow-hidden shadow-xl text-center
-                      ring-4
+                    className={`w-40 sm:w-44 overflow-hidden shadow-xl text-center ring-4
                       ${i === 0 && "ring-yellow-400"}
                       ${i === 1 && "ring-gray-300"}
                       ${i === 2 && "ring-amber-700"}
@@ -112,14 +115,11 @@ export default function Results() {
               </div>
             </div>
 
-            {/* 📋 REST OF RANKING */}
+            {/* REST */}
             <div className="max-h-[65vh] overflow-y-auto pr-1 sm:pr-2">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
                 {rest.map((m, i) => (
-                  <Card
-                    key={m.id}
-                    className="overflow-hidden shadow hover:shadow-lg transition"
-                  >
+                  <Card key={m.id} className="overflow-hidden shadow">
                     <div className="relative aspect-[3/4]">
                       <img
                         src={m.imageUrl}
@@ -132,9 +132,7 @@ export default function Results() {
                     </div>
 
                     <div className="p-2 text-center">
-                      <div className="font-bold text-sm truncate">
-                        {m.name}
-                      </div>
+                      <div className="font-bold text-sm truncate">{m.name}</div>
                       <div className="text-[10px] text-gray-500">
                         Gen {m.generation}
                       </div>
@@ -148,34 +146,49 @@ export default function Results() {
 
         {/* ================= TIER VIEW ================= */}
         {view === "tier" && (
-          <div className="space-y-8 max-h-[75vh] sm:max-h-[80vh] overflow-y-auto pr-1 sm:pr-2">
+          <div className="space-y-6 max-h-[75vh] sm:max-h-[80vh] overflow-y-auto pr-1 sm:pr-2">
             {Object.entries(tiers).map(([tier, members]) => (
-              <div key={tier}>
-                <h2 className="text-xl sm:text-2xl font-bold mb-4">
-                  {tier} Tier ({members.length})
-                </h2>
+              <div
+                key={tier}
+                className="bg-white/70 backdrop-blur rounded-xl shadow-md overflow-hidden"
+              >
+                {/* TIER HEADER */}
+                <div
+                  className={`flex items-center justify-between px-4 py-3 font-bold text-lg ${tierColors[tier]}`}
+                >
+                  <span>{tier}</span>
+                  <span className="text-sm opacity-90">
+                    {members.length} members
+                  </span>
+                </div>
 
-                <div className="flex flex-wrap gap-2 sm:gap-3">
-                  {members.map((m) => (
-                    <div
-                      key={m.id}
-                      className="bg-white rounded shadow px-3 py-2 flex items-center gap-3"
-                    >
-                      <span className="text-xs sm:text-sm font-bold">
-                        #{ranking.indexOf(m) + 1}
-                      </span>
+                {/* MEMBERS */}
+                <div className="p-4">
+                  <div className="flex gap-3 overflow-x-auto pb-2 justify-start">
+                    {members.map((m) => (
+                      <div
+                        key={m.id}
+                       className="w-[120px] sm:w-[140px] flex-shrink-0 bg-white rounded-lg shadow"
+                      >
+                        <div className="aspect-[3/4] overflow-hidden rounded-t-lg">
+                          <img
+                            src={m.imageUrl}
+                            alt={m.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
 
-                      <img
-                        src={m.imageUrl}
-                        alt={m.name}
-                        className="w-8 h-8 rounded object-cover"
-                      />
-
-                      <span className="text-xs sm:text-sm whitespace-nowrap">
-                        {m.name}
-                      </span>
-                    </div>
-                  ))}
+                        <div className="p-2 text-center">
+                          <div className="text-xs font-bold truncate">
+                            {m.name}
+                          </div>
+                          <div className="text-[10px] text-gray-500">
+                            #{ranking.indexOf(m) + 1} • Gen {m.generation}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
