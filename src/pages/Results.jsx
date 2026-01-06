@@ -8,7 +8,6 @@ export default function Results() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const ranking = state?.ranking || [];
-
   const [view, setView] = useState("ranking"); // ranking | tier
 
   if (!ranking.length) {
@@ -19,7 +18,7 @@ export default function Results() {
     );
   }
 
-  /* ================= TIER LOGIC (FIXED SIZE) ================= */
+  /* ================= TIER LOGIC ================= */
   const tiers = {
     Oshimen: ranking.slice(0, 1),
     "Niban-Oshi": ranking.slice(1, 3),
@@ -43,6 +42,11 @@ export default function Results() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 sm:px-6 py-8 sm:py-10">
       <div className="max-w-7xl mx-auto">
 
+        {/* ================= APP TITLE ================= */}
+        <h1 className="text-center text-2xl sm:text-4xl font-extrabold text-emerald-700 mb-6">
+          KLP48 Member Sorter
+        </h1>
+
         {/* ================= HEADER ================= */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
           <Button
@@ -54,9 +58,9 @@ export default function Results() {
             Home
           </Button>
 
-          <h1 className="text-center text-xl sm:text-3xl font-bold text-emerald-600">
+          <h2 className="text-center text-lg sm:text-2xl font-bold text-emerald-600">
             Results — {ranking.length} Members
-          </h1>
+          </h2>
 
           <div className="flex w-full sm:w-auto gap-2">
             <Button
@@ -79,9 +83,9 @@ export default function Results() {
         {/* ================= RANKING VIEW ================= */}
         {view === "ranking" && (
           <>
-            {/* 🏆 TOP 3 */}
+            {/* TOP 3 */}
             <div className="mb-10">
-              <h2 className="text-2xl font-bold text-center mb-6">🏆 Top 3</h2>
+              <h3 className="text-2xl font-bold text-center mb-6">🏆 Top 3</h3>
 
               <div className="flex justify-center gap-4 sm:gap-8">
                 {podium.map((m, i) => (
@@ -144,9 +148,9 @@ export default function Results() {
           </>
         )}
 
-        {/* ================= TIER VIEW ================= */}
+        {/* ================= TIER VIEW (SMALL & MOBILE FRIENDLY) ================= */}
         {view === "tier" && (
-          <div className="space-y-6 max-h-[75vh] sm:max-h-[80vh] overflow-y-auto pr-1 sm:pr-2">
+          <div className="space-y-5 max-h-[75vh] sm:max-h-[80vh] overflow-y-auto pr-1 sm:pr-2">
             {Object.entries(tiers).map(([tier, members]) => (
               <div
                 key={tier}
@@ -154,23 +158,23 @@ export default function Results() {
               >
                 {/* TIER HEADER */}
                 <div
-                  className={`flex items-center justify-between px-4 py-3 font-bold text-lg ${tierColors[tier]}`}
+                  className={`flex items-center justify-between px-3 py-2 font-bold text-base ${tierColors[tier]}`}
                 >
                   <span>{tier}</span>
-                  <span className="text-sm opacity-90">
+                  <span className="text-xs opacity-90">
                     {members.length} members
                   </span>
                 </div>
 
                 {/* MEMBERS */}
-                <div className="p-4">
-                  <div className="flex gap-3 overflow-x-auto pb-2 justify-start">
+                <div className="p-3">
+                  <div className="flex gap-2 overflow-x-auto pb-1">
                     {members.map((m) => (
                       <div
                         key={m.id}
-                       className="w-[120px] sm:w-[140px] flex-shrink-0 bg-white rounded-lg shadow"
+                        className="w-[96px] sm:w-[120px] flex-shrink-0 bg-white rounded-md shadow"
                       >
-                        <div className="aspect-[3/4] overflow-hidden rounded-t-lg">
+                        <div className="aspect-[4/5] overflow-hidden rounded-t-md">
                           <img
                             src={m.imageUrl}
                             alt={m.name}
@@ -178,11 +182,11 @@ export default function Results() {
                           />
                         </div>
 
-                        <div className="p-2 text-center">
-                          <div className="text-xs font-bold truncate">
+                        <div className="p-1.5 text-center">
+                          <div className="text-[11px] font-semibold truncate">
                             {m.name}
                           </div>
-                          <div className="text-[10px] text-gray-500">
+                          <div className="text-[9px] text-gray-500">
                             #{ranking.indexOf(m) + 1} • Gen {m.generation}
                           </div>
                         </div>
@@ -196,6 +200,10 @@ export default function Results() {
         )}
 
       </div>
+       {/* FOOTER */}
+      <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-400">
+        © 2026 <span className="font-semibold text-gray-500">Malvin Evano</span>. All rights reserved.
+        </footer>
     </div>
   );
 }

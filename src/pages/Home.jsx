@@ -56,16 +56,15 @@ export default function Home() {
                      py-16 sm:py-20"
         >
           <h1 className="text-4xl xs:text-5xl sm:text-6xl xl:text-8xl font-black tracking-tight text-emerald-600">
-            KLP48
+            KLP48 Member Sorter
           </h1>
 
           <h2 className="mt-3 text-lg xs:text-xl sm:text-2xl xl:text-4xl font-bold text-gray-800">
-            Member Ranker
+            Pick you Oshi
           </h2>
 
           <p className="mt-5 max-w-xl text-sm xs:text-base sm:text-lg xl:text-xl text-gray-600 leading-relaxed">
-            🌿 An unofficial fan-made app that lets you rank KLP48 members and
-            discover your personal bias — built for fans, by fans.
+            Rank your KLP48 favorites and find your bias. A simple app built by fans.
           </p>
 
           <div className="mt-6 flex flex-col xs:flex-row gap-3 xs:items-center">
