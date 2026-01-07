@@ -13,6 +13,9 @@ export const members = [
   { id: 11, name: "Tiffany", fullName: "Elvyone Tiffany Ticha", generation: 1, status: "active", imageUrl: "/members/Tiffany.jpg" },
   { id: 12, name: "Yi Shyan", fullName: "Foo Yi Shyan", generation: 1, status: "active", imageUrl: "/members/YiShyan.jpg" },
   { id: 13, name: "Yurina", fullName: "Gyoten Yurina", generation: 1, status: "active", imageUrl: "/members/Yurina.jpg" },
+  { id: 27, name: "Devi", fullName: "Made Devi Ranita Ningtara", generation: 1, status: "active", imageUrl: "/members/Devi1.jpg" },
+  { id: 28, name: "Devi", fullName: "Made Devi Ranita Ningtara", generation: 1, status: "active", imageUrl: "/members/Devi2.jpg" },
+
 
   // Generation 2
   { id: 14, name: "Aisha", fullName: "Turysbek Aisha", generation: 2, status: "active", imageUrl: "/members/Aisha.jpg" },
@@ -28,4 +31,5 @@ export const members = [
   { id: 24, name: "Sharleez", fullName: "Sharifah Sharleez", generation: 2, status: "active", imageUrl: "/members/Sharleez.jpg" },
   { id: 25, name: "Shu Zhen", fullName: "Kuak Shu Zhen", generation: 2, status: "active", imageUrl: "/members/ShuZhen.jpg" },
   { id: 26, name: "Tara", fullName: "Tara Tan", generation: 2, status: "active", imageUrl: "/members/Tara.jpg" },
+
 ];
