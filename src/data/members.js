@@ -13,8 +13,7 @@ export const members = [
   { id: 11, name: "Tiffany", fullName: "Elvyone Tiffany Ticha", generation: 1, status: "active", imageUrl: "/members/Tiffany.jpg" },
   { id: 12, name: "Yi Shyan", fullName: "Foo Yi Shyan", generation: 1, status: "active", imageUrl: "/members/YiShyan.jpg" },
   { id: 13, name: "Yurina", fullName: "Gyoten Yurina", generation: 1, status: "active", imageUrl: "/members/Yurina.jpg" },
-  { id: 27, name: "Devi", fullName: "Made Devi Ranita Ningtara", generation: 1, status: "active", imageUrl: "/members/Devi1.jpg" },
-  { id: 28, name: "Devi", fullName: "Made Devi Ranita Ningtara", generation: 1, status: "active", imageUrl: "/members/Devi2.jpg" },
+  
 
 
   // Generation 2
