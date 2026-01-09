@@ -1,18 +1,51 @@
-# React + Vite
+# 🎀 Klp48 Member Sorter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Klp48 Member Sorter is a **fan-made web application** that allows users to interactively sort and rank their favorite KLP48 members. This project is created for entertainment purposes and to explore user preferences in a fun and engaging way.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📖 Description
 
-## React Compiler
+Klp48 Member Sorter provides an enjoyable experience for KLP48 fans to select and rank members based on their personal preferences. With a clean and responsive user interface, users can easily perform the sorting process directly from their browser.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+This project was built as a frontend learning project using modern web technologies such as React and Vite, and is deployed using Vercel for public access.
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🎯 Interactive member sorting experience
+- 🖼️ Clean and responsive user interface
+- ⚡ Fast performance powered by Vite
+- 🌐 Accessible online via web browser
+- 🎨 User-friendly design for fans
+
+---
+
+## 🛠️ Tech Stack
+
+- **React** — Frontend library for building user interfaces
+- **Vite** — Fast build tool for modern web projects
+- **JavaScript (JSX)** — Application logic and UI structure
+- **CSS / Tailwind CSS** — Styling and layout
+- **Vercel** — Deployment and hosting platform
+
+---
+
+## 🚀 Deployment
+
+This project is deployed using **Vercel** and can be accessed online at:
+
+🔗 https://klp48-member-sorter.vercel.app
+
+---
+
+## 📦 Installation
+
+To run this project locally:
+
+```bash
+git clone https://github.com/Vinzryyy/Klp48-member-sorter.git
+cd Klp48-member-sorter
+npm install
+npm run dev
