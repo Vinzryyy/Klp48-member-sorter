@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, RotateCcw, Undo2 } from "lucide-react";
@@ -10,6 +12,8 @@ import { ArrowLeft, RotateCcw, Undo2 } from "lucide-react";
 export default function Sorter() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const members = state?.members || [];
 
   const [stack, setStack] = useState([]);
@@ -24,7 +28,7 @@ export default function Sorter() {
   useEffect(() => {
     if (members.length < 2) return;
     const shuffled = [...members].sort(() => Math.random() - 0.5);
-    setStack(shuffled.map(m => [m]));
+    setStack(shuffled.map((m) => [m]));
   }, [members]);
 
   /* ---------- LOAD NEXT MERGE ---------- */
@@ -47,29 +51,29 @@ export default function Sorter() {
 
   /* ---------- HISTORY ---------- */
   const saveHistory = () => {
-    setHistory(h => [...h, { left, right, merged, stack, comparisons }]);
+    setHistory((h) => [...h, { left, right, merged, stack, comparisons }]);
   };
 
   const pickLeft = () => {
     saveHistory();
-    setMerged(m => [...m, left[0]]);
-    setLeft(l => l.slice(1));
-    setComparisons(c => c + 1);
+    setMerged((m) => [...m, left[0]]);
+    setLeft((l) => l.slice(1));
+    setComparisons((c) => c + 1);
   };
 
   const pickRight = () => {
     saveHistory();
-    setMerged(m => [...m, right[0]]);
-    setRight(r => r.slice(1));
-    setComparisons(c => c + 1);
+    setMerged((m) => [...m, right[0]]);
+    setRight((r) => r.slice(1));
+    setComparisons((c) => c + 1);
   };
 
   const pickTie = () => {
     saveHistory();
-    setMerged(m => [...m, left[0], right[0]]);
-    setLeft(l => l.slice(1));
-    setRight(r => r.slice(1));
-    setComparisons(c => c + 1);
+    setMerged((m) => [...m, left[0], right[0]]);
+    setLeft((l) => l.slice(1));
+    setRight((r) => r.slice(1));
+    setComparisons((c) => c + 1);
   };
 
   const undo = () => {
@@ -80,29 +84,30 @@ export default function Sorter() {
     setMerged(prev.merged);
     setStack(prev.stack);
     setComparisons(prev.comparisons);
-    setHistory(h => h.slice(0, -1));
+    setHistory((h) => h.slice(0, -1));
   };
 
   /* ---------- AUTO FINISH ---------- */
   useEffect(() => {
     if (!left.length && right.length) {
-      setMerged(m => [...m, ...right]);
+      setMerged((m) => [...m, ...right]);
       setRight([]);
     }
     if (!right.length && left.length) {
-      setMerged(m => [...m, ...left]);
+      setMerged((m) => [...m, ...left]);
       setLeft([]);
     }
     if (!left.length && !right.length && merged.length) {
-      setStack(s => [...s, merged]);
+      setStack((s) => [...s, merged]);
       setMerged([]);
     }
   }, [left, right, merged]);
 
+  /* ---------- STATES ---------- */
   if (members.length < 2) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg">
-        Not enough members selected.
+        {t("notEnoughMembers")}
       </div>
     );
   }
@@ -110,13 +115,16 @@ export default function Sorter() {
   if (!left.length || !right.length) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg">
-        Preparing comparisons…
+        {t("preparing")}
       </div>
     );
   }
 
   const estimated = Math.ceil(members.length * Math.log2(members.length));
-  const progress = Math.min(Math.round((comparisons / estimated) * 100), 100);
+  const progress = Math.min(
+    Math.round((comparisons / estimated) * 100),
+    100
+  );
 
   const L = left[0];
   const R = right[0];
@@ -128,18 +136,17 @@ export default function Sorter() {
         {/* APP TITLE */}
         <div className="text-center mb-4">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-emerald-700">
-            KLP48 Member Sorter
+            {t("title")}
           </h1>
         </div>
 
         {/* HEADER */}
         <div className="flex flex-col gap-4 mb-8">
-
-          {/* BUTTONS — ALWAYS CENTERED */}
+          {/* BUTTONS */}
           <div className="flex justify-center gap-2 flex-wrap">
             <Button variant="outline" onClick={() => navigate("/")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {t("back")}
             </Button>
 
             <Button
@@ -148,38 +155,40 @@ export default function Sorter() {
               disabled={!history.length}
             >
               <Undo2 className="mr-2 h-4 w-4" />
-              Undo
+              {t("undo")}
             </Button>
 
             <Button variant="outline" onClick={() => navigate("/")}>
               <RotateCcw className="mr-2 h-4 w-4" />
-              Restart
+              {t("restart")}
             </Button>
           </div>
 
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-emerald-600">
-              Choose One
+              {t("chooseOne")}
             </h2>
             <p className="text-sm text-gray-600">
-              {comparisons} comparisons • {progress}% complete
+              {t("progress", { comparisons, progress })}
             </p>
           </div>
         </div>
 
         {/* COMPARISON GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
-
           <Card
             onClick={pickLeft}
             className="order-1 cursor-pointer hover:scale-105 transition shadow-xl overflow-hidden"
           >
-            <img src={L.imageUrl} alt={L.name}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover" />
+            <img
+              src={L.imageUrl}
+              alt={L.name}
+              className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover"
+            />
             <div className="p-4 text-center">
               <h3 className="font-bold">{L.name}</h3>
               <p className="text-xs text-gray-500">
-                Generation {L.generation}
+                {t("generationLabel", { gen: L.generation })}
               </p>
             </div>
           </Card>
@@ -191,7 +200,7 @@ export default function Sorter() {
               onClick={pickTie}
               className="w-full sm:w-2/3 lg:w-auto"
             >
-              They are equal
+              {t("equal")}
             </Button>
           </div>
 
@@ -199,22 +208,29 @@ export default function Sorter() {
             onClick={pickRight}
             className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-xl overflow-hidden"
           >
-            <img src={R.imageUrl} alt={R.name}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover" />
+            <img
+              src={R.imageUrl}
+              alt={R.name}
+              className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover"
+            />
             <div className="p-4 text-center">
               <h3 className="font-bold">{R.name}</h3>
               <p className="text-xs text-gray-500">
-                Generation {R.generation}
+                {t("generationLabel", { gen: R.generation })}
               </p>
             </div>
           </Card>
-
         </div>
       </div>
-       {/* FOOTER */}
+
+      {/* FOOTER */}
       <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-400">
-        © 2026 <span className="font-semibold text-gray-500">Malvin Evano</span>. All rights reserved.
-        </footer>
+        © 2026{" "}
+        <span className="font-semibold text-gray-500">
+          Malvin Evano
+        </span>
+        . All rights reserved.
+      </footer>
     </div>
   );
 }

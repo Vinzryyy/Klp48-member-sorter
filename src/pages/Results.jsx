@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
@@ -7,32 +9,34 @@ import { ArrowLeft } from "lucide-react";
 export default function Results() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const ranking = state?.ranking || [];
   const [view, setView] = useState("ranking"); // ranking | tier
 
   if (!ranking.length) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg">
-        No ranking data
+        {t("noRanking")}
       </div>
     );
   }
 
   /* ================= TIER LOGIC ================= */
   const tiers = {
-    Oshimen: ranking.slice(0, 1),
-    "Niban-Oshi": ranking.slice(1, 3),
-    Oshisama: ranking.slice(3, 8),
-    Kikinarai: ranking.slice(8, 13),
-    Chikasashi: ranking.slice(13),
+    oshimen: ranking.slice(0, 1),
+    niban: ranking.slice(1, 3),
+    oshisama: ranking.slice(3, 8),
+    kikinarai: ranking.slice(8, 13),
+    chikasashi: ranking.slice(13),
   };
 
   const tierColors = {
-    Oshimen: "bg-yellow-400 text-yellow-900",
-    "Niban-Oshi": "bg-emerald-500 text-white",
-    Oshisama: "bg-blue-500 text-white",
-    Kikinarai: "bg-gray-400 text-white",
-    Chikasashi: "bg-zinc-600 text-white",
+    oshimen: "bg-yellow-400 text-yellow-900",
+    niban: "bg-emerald-500 text-white",
+    oshisama: "bg-blue-500 text-white",
+    kikinarai: "bg-gray-400 text-white",
+    chikasashi: "bg-zinc-600 text-white",
   };
 
   const podium = ranking.slice(0, 3);
@@ -44,7 +48,7 @@ export default function Results() {
 
         {/* ================= APP TITLE ================= */}
         <h1 className="text-center text-2xl sm:text-4xl font-extrabold text-emerald-700 mb-6">
-          KLP48 Member Sorter
+          {t("title")}
         </h1>
 
         {/* ================= HEADER ================= */}
@@ -55,11 +59,11 @@ export default function Results() {
             className="w-full sm:w-auto"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Home
+            {t("home")}
           </Button>
 
           <h2 className="text-center text-lg sm:text-2xl font-bold text-emerald-600">
-            Results — {ranking.length} Members
+            {t("resultsTitle", { count: ranking.length })}
           </h2>
 
           <div className="flex w-full sm:w-auto gap-2">
@@ -68,14 +72,14 @@ export default function Results() {
               variant={view === "ranking" ? "default" : "outline"}
               onClick={() => setView("ranking")}
             >
-              Ranking
+              {t("ranking")}
             </Button>
             <Button
               className="flex-1 sm:flex-none"
               variant={view === "tier" ? "default" : "outline"}
               onClick={() => setView("tier")}
             >
-              Tier List
+              {t("tier")}
             </Button>
           </div>
         </div>
@@ -85,7 +89,9 @@ export default function Results() {
           <>
             {/* TOP 3 */}
             <div className="mb-10">
-              <h3 className="text-2xl font-bold text-center mb-6">My Top 3 Oshi 🏆</h3>
+              <h3 className="text-2xl font-bold text-center mb-6">
+                {t("top3")}
+              </h3>
 
               <div className="flex justify-center gap-4 sm:gap-8">
                 {podium.map((m, i) => (
@@ -111,7 +117,7 @@ export default function Results() {
                     <div className="p-3">
                       <div className="font-bold truncate">{m.name}</div>
                       <div className="text-xs text-gray-500">
-                        Gen {m.generation}
+                        {t("generationLabel", { gen: m.generation })}
                       </div>
                     </div>
                   </Card>
@@ -138,7 +144,7 @@ export default function Results() {
                     <div className="p-2 text-center">
                       <div className="font-bold text-sm truncate">{m.name}</div>
                       <div className="text-[10px] text-gray-500">
-                        Gen {m.generation}
+                        {t("generationLabel", { gen: m.generation })}
                       </div>
                     </div>
                   </Card>
@@ -148,51 +154,44 @@ export default function Results() {
           </>
         )}
 
-        {/* ================= TIER VIEW (SMALL & MOBILE FRIENDLY) ================= */}
+        {/* ================= TIER VIEW ================= */}
         {view === "tier" && (
-          <div className="space-y-5 max-h-[75vh] sm:max-h-[80vh] overflow-y-auto pr-1 sm:pr-2">
+          <div className="space-y-5 max-h-[75vh] overflow-y-auto pr-1">
             {Object.entries(tiers).map(([tier, members]) => (
               <div
                 key={tier}
                 className="bg-white/70 backdrop-blur rounded-xl shadow-md overflow-hidden"
               >
-                {/* TIER HEADER */}
                 <div
-                  className={`flex items-center justify-between px-3 py-2 font-bold text-base ${tierColors[tier]}`}
+                  className={`flex items-center justify-between px-3 py-2 font-bold ${tierColors[tier]}`}
                 >
-                  <span>{tier}</span>
-                  <span className="text-xs opacity-90">
-                    {members.length} members
+                  <span>{t(`tier.${tier}`)}</span>
+                  <span className="text-xs">
+                    {members.length} {t("members")}
                   </span>
                 </div>
 
-                {/* MEMBERS */}
-                <div className="p-3">
-                  <div className="flex gap-2 overflow-x-auto pb-1">
-                    {members.map((m) => (
-                      <div
-                        key={m.id}
-                        className="w-[96px] sm:w-[120px] flex-shrink-0 bg-white rounded-md shadow"
-                      >
-                        <div className="aspect-[4/5] overflow-hidden rounded-t-md">
-                          <img
-                            src={m.imageUrl}
-                            alt={m.name}
-                            className="w-full h-full object-cover"
-                          />
+                <div className="p-3 flex gap-2 overflow-x-auto">
+                  {members.map((m) => (
+                    <div
+                      key={m.id}
+                      className="w-[96px] flex-shrink-0 bg-white rounded-md shadow"
+                    >
+                      <img
+                        src={m.imageUrl}
+                        alt={m.name}
+                        className="aspect-[4/5] object-cover rounded-t-md"
+                      />
+                      <div className="p-1 text-center">
+                        <div className="text-[11px] font-semibold truncate">
+                          {m.name}
                         </div>
-
-                        <div className="p-1.5 text-center">
-                          <div className="text-[11px] font-semibold truncate">
-                            {m.name}
-                          </div>
-                          <div className="text-[9px] text-gray-500">
-                            #{ranking.indexOf(m) + 1} • Gen {m.generation}
-                          </div>
+                        <div className="text-[9px] text-gray-500">
+                          #{ranking.indexOf(m) + 1} • {t("generationLabel", { gen: m.generation })}
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -200,10 +199,11 @@ export default function Results() {
         )}
 
       </div>
-       {/* FOOTER */}
+
+      {/* FOOTER */}
       <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-400">
         © 2026 <span className="font-semibold text-gray-500">Malvin Evano</span>. All rights reserved.
-        </footer>
+      </footer>
     </div>
   );
 }
