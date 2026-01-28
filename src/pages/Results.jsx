@@ -214,14 +214,6 @@ ${url}
                 >
                   Export Full List
                 </Button>
-
-                <Button
-                  onClick={handleTwitterShare}
-                  className="sm:col-span-2 bg-sky-500 hover:bg-sky-600"
-                >
-                  <Twitter className="w-4 h-4 mr-2" />
-                  Tweet Result
-                </Button>
               </div>
             </Card>
           </>
