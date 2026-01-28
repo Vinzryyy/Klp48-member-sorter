@@ -1,18 +1,29 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { toPng } from "html-to-image";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Twitter, Image as ImageIcon } from "lucide-react";
 
 export default function Results() {
-  const { state } = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const ranking = state?.ranking || [];
-  const [view, setView] = useState("ranking"); // ranking | tier
+  /* ================= LOAD DATA (STATE OR LINK) ================= */
+  const ranking =
+    location.state?.ranking ||
+    JSON.parse(localStorage.getItem("klp48-ranking")) ||
+    [];
+
+  const [view, setView] = useState("ranking");
+  const [username, setUsername] = useState("");
+
+  const top3Ref = useRef(null);
+  const fullRef = useRef(null);
+  const tierRef = useRef(null);
 
   if (!ranking.length) {
     return (
@@ -22,64 +33,97 @@ export default function Results() {
     );
   }
 
-  /* ================= TIER LOGIC ================= */
-  const tiers = {
-    oshimen: ranking.slice(0, 1),
-    niban: ranking.slice(1, 3),
-    oshisama: ranking.slice(3, 8),
-    kikinarai: ranking.slice(8, 13),
-    chikasashi: ranking.slice(13),
-  };
-
-  const tierColors = {
-    oshimen: "bg-yellow-400 text-yellow-900",
-    niban: "bg-emerald-500 text-white",
-    oshisama: "bg-blue-500 text-white",
-    kikinarai: "bg-gray-400 text-white",
-    chikasashi: "bg-zinc-600 text-white",
-  };
-
+  /* ================= DATA ================= */
   const podium = ranking.slice(0, 3);
   const rest = ranking.slice(3);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 sm:px-6 py-8 sm:py-10">
-      <div className="max-w-7xl mx-auto">
+  /* ================= TIER LOGIC ================= */
+  const tierConfig = [
+    { key: "oshimen", label: t("tierLabel.oshimen"), count: 1 },
+    { key: "niban", label: t("tierLabel.niban"), count: 2 },
+    { key: "oshisama", label: t("tierLabel.oshisama"), count: 3 },
+    { key: "kikinarai", label: t("tierLabel.kikinarai"), count: 6 },
+    { key: "chikasashi", label: t("tierLabel.chikasashi"), count: Infinity },
+  ];
 
-        {/* ================= APP TITLE ================= */}
-        <h1 className="text-center text-2xl sm:text-4xl font-extrabold text-emerald-700 mb-6">
-          {t("title")}
+  let cursor = 0;
+  const tiers = tierConfig.map((tier) => {
+    const members =
+      tier.count === Infinity
+        ? ranking.slice(cursor)
+        : ranking.slice(cursor, cursor + tier.count);
+
+    cursor += members.length;
+    return { ...tier, members };
+  });
+
+  /* ================= IMAGE EXPORT ================= */
+  const exportImage = async (ref, filename) => {
+    if (!ref.current) return;
+    const dataUrl = await toPng(ref.current, {
+      cacheBust: true,
+      pixelRatio: 2,
+    });
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  /* ================= TWITTER (LINK ONLY) ================= */
+  const handleTwitterShare = () => {
+    const url = `${window.location.origin}/results`;
+
+    const text = `
+My KLP48 Ranking 🏆
+
+🥇 ${podium[0]?.name}
+🥈 ${podium[1]?.name}
+🥉 ${podium[2]?.name}
+
+See full result 👇
+${url}
+
+#KLP48SorterMember
+    `.trim();
+
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+      "_blank"
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+
+        {/* ================= TITLE ================= */}
+        <h1 className="text-center text-3xl sm:text-4xl font-extrabold text-emerald-700 mb-1">
+          KLP48 Member Sorter
         </h1>
+        <p className="text-center text-gray-600 mb-8">
+          My Top 3 Oshi 🏆
+        </p>
 
         {/* ================= HEADER ================= */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/")}
-            className="w-full sm:w-auto"
-          >
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+          <Button variant="outline" onClick={() => navigate("/")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("home")}
           </Button>
 
-          <h2 className="text-center text-lg sm:text-2xl font-bold text-emerald-600">
-            {t("resultsTitle", { count: ranking.length })}
-          </h2>
-
-          <div className="flex w-full sm:w-auto gap-2">
+          <div className="flex gap-2">
             <Button
-              className="flex-1 sm:flex-none"
               variant={view === "ranking" ? "default" : "outline"}
               onClick={() => setView("ranking")}
             >
-              {t("ranking")}
+              Ranking
             </Button>
             <Button
-              className="flex-1 sm:flex-none"
               variant={view === "tier" ? "default" : "outline"}
               onClick={() => setView("tier")}
             >
-              {t("tier")}
+              Tier
             </Button>
           </div>
         </div>
@@ -87,35 +131,62 @@ export default function Results() {
         {/* ================= RANKING VIEW ================= */}
         {view === "ranking" && (
           <>
-            {/* TOP 3 */}
-            <div className="mb-10">
-              <h3 className="text-2xl font-bold text-center mb-6">
-                {t("top3")}
-              </h3>
+            {/* ===== EXPORT AREA (WITH BACKGROUND) ===== */}
+            <div
+              ref={fullRef}
+              className="space-y-10 p-6 rounded-xl
+                         bg-gradient-to-br from-emerald-50 to-teal-100"
+            >
+              {/* ===== TOP 3 ===== */}
+              <div ref={top3Ref} className="bg-white p-6 rounded-xl shadow">
+                <h2 className="text-2xl font-bold text-center mb-6">
+                  Top 3
+                </h2>
 
-              <div className="flex justify-center gap-4 sm:gap-8">
-                {podium.map((m, i) => (
-                  <Card
-                    key={m.id}
-                    className={`w-40 sm:w-44 overflow-hidden shadow-xl text-center ring-4
-                      ${i === 0 && "ring-yellow-400"}
-                      ${i === 1 && "ring-gray-300"}
-                      ${i === 2 && "ring-amber-700"}
-                    `}
-                  >
-                    <div className="relative h-56 overflow-hidden">
+                <div className="flex justify-center gap-6">
+                  {podium.map((m, i) => (
+                    <Card
+                      key={m.id}
+                      className={`relative w-40 text-center overflow-hidden shadow-xl ${
+                        i === 0
+                          ? "ring-4 ring-yellow-400"
+                          : i === 1
+                          ? "ring-4 ring-gray-400"
+                          : "ring-4 ring-orange-400"
+                      }`}
+                    >
+                      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                        #{i + 1}
+                      </div>
                       <img
                         src={m.imageUrl}
                         alt={m.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-56 object-cover"
                       />
-                      <div className="absolute top-2 left-2 text-xl">
-                        {i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"}
+                      <div className="p-3">
+                        <div className="font-bold truncate">{m.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {t("generationLabel", { gen: m.generation })}
+                        </div>
                       </div>
-                    </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
 
-                    <div className="p-3">
-                      <div className="font-bold truncate">{m.name}</div>
+              {/* ===== FULL LIST (NO DUPLICATES) ===== */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+                {rest.map((m, i) => (
+                  <Card key={m.id} className="overflow-hidden shadow bg-white">
+                    <img
+                      src={m.imageUrl}
+                      alt={m.name}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-2 text-center">
+                      <div className="font-bold text-sm truncate">
+                        #{i + 4} {m.name}
+                      </div>
                       <div className="text-xs text-gray-500">
                         {t("generationLabel", { gen: m.generation })}
                       </div>
@@ -125,85 +196,78 @@ export default function Results() {
               </div>
             </div>
 
-            {/* REST */}
-            <div className="max-h-[65vh] overflow-y-auto pr-1 sm:pr-2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
-                {rest.map((m, i) => (
-                  <Card key={m.id} className="overflow-hidden shadow">
-                    <div className="relative aspect-[3/4]">
-                      <img
-                        src={m.imageUrl}
-                        alt={m.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-2 left-2 bg-emerald-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">
-                        #{i + 4}
-                      </div>
-                    </div>
+            {/* ===== SHARE BOX (NOT EXPORTED) ===== */}
+            <Card className="p-5 max-w-xl mx-auto mt-10">
 
-                    <div className="p-2 text-center">
-                      <div className="font-bold text-sm truncate">{m.name}</div>
-                      <div className="text-[10px] text-gray-500">
-                        {t("generationLabel", { gen: m.generation })}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => exportImage(top3Ref, "Top3.png")}
+                >
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Export Top 3
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => exportImage(fullRef, "FullRanking.png")}
+                >
+                  Export Full List
+                </Button>
+
+                <Button
+                  onClick={handleTwitterShare}
+                  className="sm:col-span-2 bg-sky-500 hover:bg-sky-600"
+                >
+                  <Twitter className="w-4 h-4 mr-2" />
+                  Tweet Result
+                </Button>
               </div>
-            </div>
+            </Card>
           </>
         )}
 
         {/* ================= TIER VIEW ================= */}
         {view === "tier" && (
-          <div className="space-y-5 max-h-[75vh] overflow-y-auto pr-1">
-            {Object.entries(tiers).map(([tier, members]) => (
-              <div
-                key={tier}
-                className="bg-white/70 backdrop-blur rounded-xl shadow-md overflow-hidden"
-              >
-                <div
-                  className={`flex items-center justify-between px-3 py-2 font-bold ${tierColors[tier]}`}
-                >
-                  <span>{t(`tier.${tier}`)}</span>
-                  <span className="text-xs">
-                    {members.length} {t("members")}
-                  </span>
-                </div>
-
-                <div className="p-3 flex gap-2 overflow-x-auto">
-                  {members.map((m) => (
-                    <div
-                      key={m.id}
-                      className="w-[96px] flex-shrink-0 bg-white rounded-md shadow"
-                    >
-                      <img
-                        src={m.imageUrl}
-                        alt={m.name}
-                        className="aspect-[4/5] object-cover rounded-t-md"
-                      />
-                      <div className="p-1 text-center">
-                        <div className="text-[11px] font-semibold truncate">
+          <>
+            <div
+              ref={tierRef}
+              className="space-y-6 p-6 rounded-xl
+                         bg-gradient-to-br from-emerald-50 to-teal-100"
+            >
+              {tiers.map((tier) => (
+                <Card key={tier.key} className="p-4">
+                  <h3 className="font-bold text-lg mb-3">{tier.label}</h3>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
+                    {tier.members.map((m) => (
+                      <div key={m.id} className="text-center">
+                        <img
+                          src={m.imageUrl}
+                          alt={m.name}
+                          className="w-full aspect-[3/4] object-cover rounded-md shadow"
+                        />
+                        <div className="text-xs mt-1 truncate">
                           {m.name}
                         </div>
-                        <div className="text-[9px] text-gray-500">
-                          #{ranking.indexOf(m) + 1} • {t("generationLabel", { gen: m.generation })}
-                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-6">
+              <Button
+                variant="outline"
+                onClick={() => exportImage(tierRef, "TierList.png")}
+              >
+                <ImageIcon className="w-4 h-4 mr-2" />
+                Export Tier List
+              </Button>
+            </div>
+          </>
         )}
-
       </div>
-
-      {/* FOOTER */}
-      <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-400">
-        © 2026 <span className="font-semibold text-gray-500">Malvin Evano</span>. All rights reserved.
-      </footer>
     </div>
   );
 }
