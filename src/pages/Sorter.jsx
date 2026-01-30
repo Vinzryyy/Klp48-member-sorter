@@ -20,17 +20,25 @@ export default function Sorter() {
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
   const [merged, setMerged] = useState([]);
-  const [comparisons, setComparisons] = useState([]);
+  const [comparisons, setComparisons] = useState(0); // ✅ MUST be number
   const [history, setHistory] = useState([]);
 
-  /* INIT */
+  /* ---------- INIT (FIXED) ---------- */
   useEffect(() => {
     if (members.length < 2) return;
+
     const shuffled = [...members].sort(() => Math.random() - 0.5);
     setStack(shuffled.map((m) => [m]));
+
+    // ✅ RESET EVERYTHING WHEN ENTER SORTER
+    setLeft([]);
+    setRight([]);
+    setMerged([]);
+    setHistory([]);
+    setComparisons(0);
   }, [members]);
 
-  /* LOAD NEXT MERGE */
+  /* ---------- LOAD NEXT MERGE ---------- */
   useEffect(() => {
     if (left.length || right.length || merged.length) return;
 
@@ -48,7 +56,7 @@ export default function Sorter() {
     }
   }, [stack, left, right, merged, navigate]);
 
-  /* HISTORY */
+  /* ---------- HISTORY ---------- */
   const saveHistory = () => {
     setHistory((h) => [...h, { left, right, merged, stack, comparisons }]);
   };
@@ -86,7 +94,7 @@ export default function Sorter() {
     setHistory((h) => h.slice(0, -1));
   };
 
-  /* AUTO FINISH */
+  /* ---------- AUTO FINISH ---------- */
   useEffect(() => {
     if (!left.length && right.length) {
       setMerged((m) => [...m, ...right]);
@@ -102,17 +110,27 @@ export default function Sorter() {
     }
   }, [left, right, merged]);
 
-  /* STATES */
+  /* ---------- STATES ---------- */
   if (members.length < 2) {
-    return <div className="min-h-screen flex items-center justify-center">{t("notEnoughMembers")}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        {t("notEnoughMembers")}
+      </div>
+    );
   }
 
   if (!left.length || !right.length) {
-    return <div className="min-h-screen flex items-center justify-center">{t("preparing")}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        {t("preparing")}
+      </div>
+    );
   }
 
+  // ✅ SAFE PROGRESS CALCULATION (FIX)
   const estimated = Math.ceil(members.length * Math.log2(members.length));
-  const progress = Math.min(Math.round((comparisons / estimated) * 100), 100);
+  const safeComparisons = Math.min(comparisons, estimated);
+  const progress = Math.round((safeComparisons / estimated) * 100);
 
   const L = left[0];
   const R = right[0];
@@ -132,7 +150,7 @@ export default function Sorter() {
             {t("chooseOne")}
           </h1>
           <p className="text-sm text-gray-600">
-            {t("progress", { comparisons, progress })}
+            {t("progress", { comparisons: safeComparisons, progress })}
           </p>
 
           {/* Progress Bar */}
@@ -156,7 +174,7 @@ export default function Sorter() {
             {t("undo")}
           </Button>
 
-          <Button variant="outline" onClick={() => navigate("/")}>
+          <Button variant="outline" onClick={() => window.location.reload()}>
             <RotateCcw className="mr-2 h-4 w-4" />
             {t("restart")}
           </Button>
@@ -165,16 +183,12 @@ export default function Sorter() {
         {/* COMPARISON GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
 
-          {/* LEFT CARD */}
+          {/* LEFT */}
           <Card
             onClick={pickLeft}
             className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
           >
-            <img
-              src={L.imageUrl}
-              alt={L.name}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover"
-            />
+            <img src={L.imageUrl} alt={L.name} className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" />
             <div className="p-4 text-center">
               <h3 className="font-bold text-lg text-emerald-700">{L.name}</h3>
               <p className="text-xs text-gray-500">
@@ -183,34 +197,24 @@ export default function Sorter() {
             </div>
           </Card>
 
-          {/* CENTER VS */}
+          {/* CENTER */}
           <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex flex-col items-center justify-center gap-4">
-            <div className="text-4xl font-black text-emerald-600 drop-shadow">
-              VS
-            </div>
+            <div className="text-4xl font-black text-emerald-600 drop-shadow">VS</div>
 
             <Button
               onClick={pickTie}
-              className="
-                px-8 py-4 text-lg font-black rounded-full
-                text-white shadow-2xl border-2 border-white
-                hover:scale-110 hover:shadow-amber-400/50 transition
-              "
+              className="px-8 py-4 text-lg font-black rounded-full text-white shadow-2xl border-2 border-white hover:scale-110 transition"
             >
               {t("equal")}
             </Button>
           </div>
 
-          {/* RIGHT CARD */}
+          {/* RIGHT */}
           <Card
             onClick={pickRight}
             className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
           >
-            <img
-              src={R.imageUrl}
-              alt={R.name}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover"
-            />
+            <img src={R.imageUrl} alt={R.name} className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" />
             <div className="p-4 text-center">
               <h3 className="font-bold text-lg text-emerald-700">{R.name}</h3>
               <p className="text-xs text-gray-500">
