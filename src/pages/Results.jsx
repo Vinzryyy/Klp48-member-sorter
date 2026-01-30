@@ -199,7 +199,7 @@ export default function Results() {
             </div>
 
             {/* ===== EXPORT BUTTONS ===== */}
-            <Card className="p-4 max-w-xl mx-auto mt-6">
+            {/* <Card className="p-4 max-w-xl mx-auto mt-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
                   variant="outline"
@@ -216,7 +216,7 @@ export default function Results() {
                   Export Full List
                 </Button>
               </div>
-            </Card>
+            </Card> */}
           </>
         )}
 
@@ -252,7 +252,7 @@ export default function Results() {
               ))}
             </div>
 
-            <div className="text-center mt-5">
+            {/* <div className="text-center mt-5">
               <Button
                 variant="outline"
                 onClick={() => exportImage(tierRef, "TierList.png")}
@@ -260,7 +260,7 @@ export default function Results() {
                 <ImageIcon className="w-4 h-4 mr-2" />
                 Export Tier List
               </Button>
-            </div>
+            </div> */}
           </>
         )}
       </div>
