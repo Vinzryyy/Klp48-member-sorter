@@ -20,18 +20,27 @@ i18n.use(initReactI18next).init({
         description:
           "Rank your KLP48 favorites and find your bias. A simple app built by fans.",
         membersReady: "{{count}} members ready",
+        membersReadyShort: "{{count}} Members Ready",
         filterHint: "Filter and start ranking instantly",
+
         filterTitle: "Filter Members",
         filterDesc: "Choose your preferences before ranking",
+        filterMembersTitle: "Filter Members",
+        filterMembersDesc: "Choose your favorite members before ranking!",
+
         status: "Status",
         generation: "Generation",
         allMembers: "All Members",
         active: "Active Members",
         graduated: "Graduated Members",
-        allGen: "All generations",
+        allGen: "All Generations",
         gen1: "Generation 1",
         gen2: "Generation 2",
-        start: "Start Ranking 🚀",
+
+        start: "Start Ranking ",
+        startRanking: "Start Ranking",
+        fansToday: "fans ranked today",
+
         alertMin: "Please select at least 2 members!",
 
         /* SORTER */
@@ -58,7 +67,7 @@ i18n.use(initReactI18next).init({
         tweet: "Tweet Result",
         members: "members",
 
-        /* TIER LABELS (🔥 FIX) */
+        /* TIER LABELS */
         tierLabel: {
           oshimen: "Oshimen",
           niban: "Niban-Oshi",
@@ -76,9 +85,14 @@ i18n.use(initReactI18next).init({
         subtitle: "选择你的推",
         description: "为你最喜欢的 KLP48 成员排序。",
         membersReady: "{{count}} 名成员已准备",
+        membersReadyShort: "{{count}} 名成员已准备",
         filterHint: "筛选后立即开始",
+
         filterTitle: "筛选成员",
         filterDesc: "排序前选择偏好",
+        filterMembersTitle: "筛选成员",
+        filterMembersDesc: "排序前选择你喜欢的成员！",
+
         status: "状态",
         generation: "期别",
         allMembers: "全部成员",
@@ -87,7 +101,11 @@ i18n.use(initReactI18next).init({
         allGen: "全部期别",
         gen1: "一期生",
         gen2: "二期生",
-        start: "开始排序 🚀",
+
+        start: "开始排序 ",
+        startRanking: "开始排序",
+        fansToday: "粉丝今日参与",
+
         alertMin: "请至少选择 2 名成员！",
 
         notEnoughMembers: "成员不足。",
@@ -129,9 +147,14 @@ i18n.use(initReactI18next).init({
         subtitle: "Pilih Oshi Anda",
         description: "Susun ahli kegemaran KLP48 anda.",
         membersReady: "{{count}} ahli sedia",
+        membersReadyShort: "{{count}} Ahli Sedia",
         filterHint: "Tapis dan mula segera",
+
         filterTitle: "Tapis Ahli",
         filterDesc: "Pilih keutamaan",
+        filterMembersTitle: "Tapis Ahli",
+        filterMembersDesc: "Pilih ahli kegemaran sebelum susun!",
+
         status: "Status",
         generation: "Generasi",
         allMembers: "Semua Ahli",
@@ -140,7 +163,11 @@ i18n.use(initReactI18next).init({
         allGen: "Semua Generasi",
         gen1: "Generasi 1",
         gen2: "Generasi 2",
-        start: "Mula Susun 🚀",
+
+        start: "Mula Susun ",
+        startRanking: "Mula Susun",
+        fansToday: "peminat hari ini",
+
         alertMin: "Pilih sekurang-kurangnya 2 ahli!",
 
         notEnoughMembers: "Ahli tidak mencukupi.",
@@ -182,9 +209,14 @@ i18n.use(initReactI18next).init({
         subtitle: "推しを選ぼう",
         description: "KLP48 の推しをランキング。",
         membersReady: "{{count}} 人準備完了",
+        membersReadyShort: "{{count}} 人準備完了",
         filterHint: "すぐ開始",
+
         filterTitle: "メンバー選択",
         filterDesc: "条件を選択",
+        filterMembersTitle: "メンバー選択",
+        filterMembersDesc: "推しを選んでランキング開始！",
+
         status: "ステータス",
         generation: "期",
         allMembers: "全メンバー",
@@ -193,7 +225,11 @@ i18n.use(initReactI18next).init({
         allGen: "全期",
         gen1: "1期生",
         gen2: "2期生",
-        start: "開始 🚀",
+
+        start: "開始 ",
+        startRanking: "開始",
+        fansToday: "今日のファン",
+
         alertMin: "2人以上選択してください！",
 
         notEnoughMembers: "人数が足りません。",

@@ -20,18 +20,17 @@ export default function Sorter() {
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
   const [merged, setMerged] = useState([]);
-  const [comparisons, setComparisons] = useState(0);
-
+  const [comparisons, setComparisons] = useState([]);
   const [history, setHistory] = useState([]);
 
-  /* ---------- INIT ---------- */
+  /* INIT */
   useEffect(() => {
     if (members.length < 2) return;
     const shuffled = [...members].sort(() => Math.random() - 0.5);
     setStack(shuffled.map((m) => [m]));
   }, [members]);
 
-  /* ---------- LOAD NEXT MERGE ---------- */
+  /* LOAD NEXT MERGE */
   useEffect(() => {
     if (left.length || right.length || merged.length) return;
 
@@ -49,7 +48,7 @@ export default function Sorter() {
     }
   }, [stack, left, right, merged, navigate]);
 
-  /* ---------- HISTORY ---------- */
+  /* HISTORY */
   const saveHistory = () => {
     setHistory((h) => [...h, { left, right, merged, stack, comparisons }]);
   };
@@ -87,7 +86,7 @@ export default function Sorter() {
     setHistory((h) => h.slice(0, -1));
   };
 
-  /* ---------- AUTO FINISH ---------- */
+  /* AUTO FINISH */
   useEffect(() => {
     if (!left.length && right.length) {
       setMerged((m) => [...m, ...right]);
@@ -103,118 +102,117 @@ export default function Sorter() {
     }
   }, [left, right, merged]);
 
-  /* ---------- STATES ---------- */
+  /* STATES */
   if (members.length < 2) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-lg">
-        {t("notEnoughMembers")}
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">{t("notEnoughMembers")}</div>;
   }
 
   if (!left.length || !right.length) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-lg">
-        {t("preparing")}
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">{t("preparing")}</div>;
   }
 
   const estimated = Math.ceil(members.length * Math.log2(members.length));
-  const progress = Math.min(
-    Math.round((comparisons / estimated) * 100),
-    100
-  );
+  const progress = Math.min(Math.round((comparisons / estimated) * 100), 100);
 
   const L = left[0];
   const R = right[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-200 px-4 py-8 relative overflow-hidden">
 
-        {/* APP TITLE */}
+      {/* Glow bubbles */}
+      <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-300/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-400/30 rounded-full blur-3xl" />
+
+      <div className="max-w-6xl mx-auto relative">
+
+        {/* TITLE */}
         <div className="text-center mb-4">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-emerald-700">
-            {t("title")}
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-emerald-700 drop-shadow">
+            {t("chooseOne")}
           </h1>
+          <p className="text-sm text-gray-600">
+            {t("progress", { comparisons, progress })}
+          </p>
+
+          {/* Progress Bar */}
+          <div className="mt-2 w-full bg-white/60 rounded-full h-2 overflow-hidden">
+            <div
+              className="h-2 bg-gradient-to-r from-emerald-400 to-green-600 transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
-        {/* HEADER */}
-        <div className="flex flex-col gap-4 mb-8">
-          {/* BUTTONS */}
-          <div className="flex justify-center gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => navigate("/")}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("back")}
-            </Button>
+        {/* BUTTONS */}
+        <div className="flex justify-center gap-2 flex-wrap mb-6">
+          <Button variant="outline" onClick={() => navigate("/")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("back")}
+          </Button>
 
-            <Button
-              variant="outline"
-              onClick={undo}
-              disabled={!history.length}
-            >
-              <Undo2 className="mr-2 h-4 w-4" />
-              {t("undo")}
-            </Button>
+          <Button variant="outline" onClick={undo} disabled={!history.length}>
+            <Undo2 className="mr-2 h-4 w-4" />
+            {t("undo")}
+          </Button>
 
-            <Button variant="outline" onClick={() => navigate("/")}>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              {t("restart")}
-            </Button>
-          </div>
-
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-emerald-600">
-              {t("chooseOne")}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {t("progress", { comparisons, progress })}
-            </p>
-          </div>
+          <Button variant="outline" onClick={() => navigate("/")}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {t("restart")}
+          </Button>
         </div>
 
         {/* COMPARISON GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
+
+          {/* LEFT CARD */}
           <Card
             onClick={pickLeft}
-            className="order-1 cursor-pointer hover:scale-105 transition shadow-xl overflow-hidden"
+            className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
           >
             <img
               src={L.imageUrl}
               alt={L.name}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover"
+              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover"
             />
             <div className="p-4 text-center">
-              <h3 className="font-bold">{L.name}</h3>
+              <h3 className="font-bold text-lg text-emerald-700">{L.name}</h3>
               <p className="text-xs text-gray-500">
                 {t("generationLabel", { gen: L.generation })}
               </p>
             </div>
           </Card>
 
-          <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex items-center justify-center">
+          {/* CENTER VS */}
+          <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex flex-col items-center justify-center gap-4">
+            <div className="text-4xl font-black text-emerald-600 drop-shadow">
+              VS
+            </div>
+
             <Button
-              variant="outline"
-              size="lg"
               onClick={pickTie}
-              className="w-full sm:w-2/3 lg:w-auto"
+              className="
+                px-8 py-4 text-lg font-black rounded-full
+                text-white shadow-2xl border-2 border-white
+                hover:scale-110 hover:shadow-amber-400/50 transition
+              "
             >
               {t("equal")}
             </Button>
           </div>
 
+          {/* RIGHT CARD */}
           <Card
             onClick={pickRight}
-            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-xl overflow-hidden"
+            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
           >
             <img
               src={R.imageUrl}
               alt={R.name}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover"
+              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover"
             />
             <div className="p-4 text-center">
-              <h3 className="font-bold">{R.name}</h3>
+              <h3 className="font-bold text-lg text-emerald-700">{R.name}</h3>
               <p className="text-xs text-gray-500">
                 {t("generationLabel", { gen: R.generation })}
               </p>
@@ -224,12 +222,8 @@ export default function Sorter() {
       </div>
 
       {/* FOOTER */}
-      <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-400">
-        © 2026{" "}
-        <span className="font-semibold text-gray-500">
-          Malvin Evano
-        </span>
-        . All rights reserved.
+      <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-500">
+        © 2026 <span className="font-semibold text-emerald-600">Malvin Evano</span> • Fan-made project
       </footer>
     </div>
   );
