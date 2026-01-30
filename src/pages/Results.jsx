@@ -55,13 +55,35 @@ export default function Results() {
     return { ...tier, members };
   });
 
+  /* ================= IMAGE HELPERS ================= */
+  const waitForImages = async (element) => {
+    const images = element.querySelectorAll("img");
+    await Promise.all(
+      Array.from(images).map(
+        (img) =>
+          img.complete ||
+          new Promise((resolve) => {
+            img.onload = img.onerror = resolve;
+          })
+      )
+    );
+  };
+
   /* ================= IMAGE EXPORT ================= */
   const exportImage = async (ref, filename) => {
     if (!ref.current) return;
+
+    await waitForImages(ref.current);
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
     const dataUrl = await toPng(ref.current, {
       cacheBust: true,
-      pixelRatio: 2,
+      pixelRatio: isIOS ? 1 : 2,
+      backgroundColor: "#ffffff",
+      useCORS: true,
     });
+
     const link = document.createElement("a");
     link.download = filename;
     link.href = dataUrl;
@@ -110,7 +132,6 @@ export default function Results() {
               ref={fullRef}
               className="space-y-8 p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-100"
             >
-
               {/* ===== TOP 3 PODIUM ===== */}
               <div ref={top3Ref} className="bg-white p-4 sm:p-6 rounded-xl shadow">
                 <h2 className="text-xl sm:text-2xl font-bold text-center mb-4">
@@ -133,11 +154,12 @@ export default function Results() {
                         #{i + 1}
                       </div>
 
-                      {/* ✅ FIXED IMAGE FOR MOBILE */}
+                      {/* ✅ iOS SAFE IMAGE */}
                       <img
                         src={m.imageUrl}
                         alt={m.name}
-                        className="w-full h-32 sm:h-64 object-contain bg-black"
+                        crossOrigin="anonymous"
+                        className="w-full h-32 sm:h-64 object-cover bg-white"
                       />
 
                       <div className="p-1 sm:p-3">
@@ -160,7 +182,8 @@ export default function Results() {
                     <img
                       src={m.imageUrl}
                       alt={m.name}
-                      className="w-full h-32 sm:h-40 object-cover"
+                      crossOrigin="anonymous"
+                      className="w-full h-32 sm:h-40 object-cover bg-white"
                     />
                     <div className="p-1 text-center">
                       <div className="font-bold text-xs truncate">
@@ -216,7 +239,8 @@ export default function Results() {
                         <img
                           src={m.imageUrl}
                           alt={m.name}
-                          className="w-full aspect-[3/4] object-cover rounded shadow"
+                          crossOrigin="anonymous"
+                          className="w-full aspect-[3/4] object-cover rounded shadow bg-white"
                         />
                         <div className="text-[10px] mt-1 truncate">
                           {m.name}
