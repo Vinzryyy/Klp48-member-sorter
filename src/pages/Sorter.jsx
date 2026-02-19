@@ -1,36 +1,34 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useRankStore } from "../store/useRankStore";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, RotateCcw, Undo2 } from "lucide-react";
 
+const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
+
 /**
  * Interactive Merge Sort (FULL RANKING, WITH UNDO)
  */
 export default function Sorter() {
-  const { state } = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
-
-  const members = state?.members || [];
+  const { members, setRanking } = useRankStore();
 
   const [stack, setStack] = useState([]);
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
   const [merged, setMerged] = useState([]);
-  const [comparisons, setComparisons] = useState(0); // ✅ MUST be number
+  const [comparisons, setComparisons] = useState(0); 
   const [history, setHistory] = useState([]);
 
   /* ---------- INIT (FIXED) ---------- */
-  useEffect(() => {
+  const initSorter = useCallback(() => {
     if (members.length < 2) return;
-
     const shuffled = [...members].sort(() => Math.random() - 0.5);
     setStack(shuffled.map((m) => [m]));
-
-    // ✅ RESET EVERYTHING WHEN ENTER SORTER
     setLeft([]);
     setRight([]);
     setMerged([]);
@@ -38,12 +36,17 @@ export default function Sorter() {
     setComparisons(0);
   }, [members]);
 
+  useEffect(() => {
+    initSorter();
+  }, [initSorter]);
+
   /* ---------- LOAD NEXT MERGE ---------- */
   useEffect(() => {
     if (left.length || right.length || merged.length) return;
 
     if (stack.length === 1) {
-      navigate("/results", { state: { ranking: stack[0] } });
+      setRanking(stack[0]);
+      navigate("/results");
       return;
     }
 
@@ -54,7 +57,7 @@ export default function Sorter() {
       setMerged([]);
       setStack(rest);
     }
-  }, [stack, left, right, merged, navigate]);
+  }, [stack, left, right, merged, navigate, setRanking]);
 
   /* ---------- HISTORY ---------- */
   const saveHistory = () => {
@@ -174,7 +177,7 @@ export default function Sorter() {
             {t("undo")}
           </Button>
 
-          <Button variant="outline" onClick={() => window.location.reload()}>
+          <Button variant="outline" onClick={initSorter}>
             <RotateCcw className="mr-2 h-4 w-4" />
             {t("restart")}
           </Button>
@@ -188,7 +191,12 @@ export default function Sorter() {
             onClick={pickLeft}
             className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
           >
-            <img src={L.imageUrl} alt={L.name} className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" />
+            <img 
+              src={L.imageUrl} 
+              alt={L.name} 
+              onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
+              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" 
+            />
             <div className="p-4 text-center">
               <h3 className="font-bold text-lg text-emerald-700">{L.name}</h3>
               <p className="text-xs text-gray-500">
@@ -214,7 +222,12 @@ export default function Sorter() {
             onClick={pickRight}
             className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
           >
-            <img src={R.imageUrl} alt={R.name} className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" />
+            <img 
+              src={R.imageUrl} 
+              alt={R.name} 
+              onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
+              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" 
+            />
             <div className="p-4 text-center">
               <h3 className="font-bold text-lg text-emerald-700">{R.name}</h3>
               <p className="text-xs text-gray-500">

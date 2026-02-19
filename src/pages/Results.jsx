@@ -1,22 +1,29 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toPng } from "html-to-image";
+import { useRankStore } from "../store/useRankStore";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Image as ImageIcon } from "lucide-react";
 
+const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
+
 export default function Results() {
-  const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { ranking, setRanking } = useRankStore();
 
-  /* ================= LOAD DATA ================= */
-  const ranking =
-    location.state?.ranking ||
-    JSON.parse(localStorage.getItem("klp48-ranking")) ||
-    [];
+  /* ================= PERSISTENCE ================= */
+  useEffect(() => {
+    if (ranking.length > 0) {
+      localStorage.setItem("klp48-ranking", JSON.stringify(ranking));
+    } else {
+      const saved = localStorage.getItem("klp48-ranking");
+      if (saved) setRanking(JSON.parse(saved));
+    }
+  }, [ranking, setRanking]);
 
   const [view, setView] = useState("ranking");
 
@@ -159,6 +166,7 @@ export default function Results() {
                         src={m.imageUrl}
                         alt={m.name}
                         crossOrigin="anonymous"
+                        onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                         className="w-full h-32 sm:h-64 object-cover bg-white"
                       />
 
@@ -183,6 +191,7 @@ export default function Results() {
                       src={m.imageUrl}
                       alt={m.name}
                       crossOrigin="anonymous"
+                      onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                       className="w-full h-32 sm:h-40 object-cover bg-white"
                     />
                     <div className="p-1 text-center">
@@ -240,6 +249,7 @@ export default function Results() {
                           src={m.imageUrl}
                           alt={m.name}
                           crossOrigin="anonymous"
+                          onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                           className="w-full aspect-[3/4] object-cover rounded shadow bg-white"
                         />
                         <div className="text-[10px] mt-1 truncate">

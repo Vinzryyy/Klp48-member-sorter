@@ -22,13 +22,17 @@ import {
 import { Label } from "@/components/ui/label";
 
 import { members } from "../data/members";
+import { useRankStore } from "../store/useRankStore";
 
 export default function Home() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { setMembers } = useRankStore();
 
   const [status, setStatus] = useState("all");
   const [generation, setGeneration] = useState("all");
+
+  const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
 
   // Filter members
   const filteredMembers = useMemo(() => {
@@ -53,7 +57,8 @@ export default function Home() {
       alert(t("alertMin"));
       return;
     }
-    navigate("/sorter", { state: { members: filteredMembers } });
+    setMembers(filteredMembers);
+    navigate("/sorter");
   };
 
   const changeLanguage = (lng) => {
@@ -127,7 +132,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Avatars */}
           <div className="flex items-center -space-x-6 mt-4">
             {randomMembers.map((m, i) => (
               <motion.img
@@ -135,6 +139,7 @@ export default function Home() {
                 src={m.imageUrl}
                 alt={m.name}
                 title={m.fullName}
+                onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                 initial={{ rotate: i % 2 === 0 ? -5 : 5 }}
                 whileHover={{ scale: 1, rotate: 0 }}
                 className="w-20 h-20 sm:w-24 sm:h-24 xl:w-28 xl:h-28 rounded-full border-4 border-white shadow-2xl ring-4 ring-emerald-300 ring-offset-2 bg-white"
