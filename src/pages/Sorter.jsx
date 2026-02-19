@@ -5,7 +5,8 @@ import { useRankStore } from "../store/useRankStore";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, RotateCcw, Undo2 } from "lucide-react";
+import { ArrowLeft, RotateCcw, Undo2, Info } from "lucide-react";
+import ProfileModal from "../components/ProfileModal";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
 
@@ -30,6 +31,7 @@ export default function Sorter() {
   const [merged, setMerged] = useState([]);
   const [comparisons, setComparisons] = useState(0); 
   const [history, setHistory] = useState([]);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   /* ---------- INIT (FIXED) ---------- */
   const initSorter = useCallback(() => {
@@ -196,8 +198,17 @@ export default function Sorter() {
           {/* LEFT */}
           <Card
             onClick={pickLeft}
-            className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
+            className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200 relative group"
           >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedProfile(L);
+              }}
+              className="absolute top-3 right-3 z-10 p-2 bg-white/80 hover:bg-emerald-500 hover:text-white text-emerald-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition duration-300"
+            >
+              <Info className="w-5 h-5" />
+            </button>
             <img 
               src={L.imageUrl} 
               alt={L.name} 
@@ -227,8 +238,17 @@ export default function Sorter() {
           {/* RIGHT */}
           <Card
             onClick={pickRight}
-            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200"
+            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200 relative group"
           >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedProfile(R);
+              }}
+              className="absolute top-3 right-3 z-10 p-2 bg-white/80 hover:bg-emerald-500 hover:text-white text-emerald-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition duration-300"
+            >
+              <Info className="w-5 h-5" />
+            </button>
             <img 
               src={R.imageUrl} 
               alt={R.name} 
@@ -249,6 +269,13 @@ export default function Sorter() {
       <footer className="w-full py-6 text-center text-xs sm:text-sm text-gray-500">
         © 2026 <span className="font-semibold text-emerald-600">Malvin Evano</span> • Fan-made project
       </footer>
+
+      {/* Profile Modal */}
+      <ProfileModal 
+        member={selectedProfile} 
+        isOpen={!!selectedProfile} 
+        onClose={() => setSelectedProfile(null)} 
+      />
     </div>
   );
 }

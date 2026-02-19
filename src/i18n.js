@@ -75,6 +75,17 @@ i18n.use(initReactI18next).init({
           kikinarai: "Kikinarai",
           chikasashi: "Chikasashi",
         },
+
+        /* MEMBERS PAGE */
+        membersPage: {
+          title: "KLP48 Directory",
+          searchPlaceholder: "Search name...",
+          allStatus: "All Status",
+          allGen: "All Generations",
+          showingCount: "Showing {{count}} members",
+          noResults: "No members found matching your search.",
+          generation: "Gen {{gen}}",
+        },
       },
     },
 
@@ -136,6 +147,17 @@ i18n.use(initReactI18next).init({
           oshisama: "神推",
           kikinarai: "关注中",
           chikasashi: "地下推",
+        },
+
+        /* MEMBERS PAGE */
+        membersPage: {
+          title: "KLP48 成员名录",
+          searchPlaceholder: "搜索姓名...",
+          allStatus: "全部状态",
+          allGen: "全部期别",
+          showingCount: "显示 {{count}} 名成员",
+          noResults: "没有找到匹配的成员。",
+          generation: "{{gen}} 期生",
         },
       },
     },
@@ -199,6 +221,17 @@ i18n.use(initReactI18next).init({
           kikinarai: "Menarik",
           chikasashi: "Chika",
         },
+
+        /* MEMBERS PAGE */
+        membersPage: {
+          title: "Direktori KLP48",
+          searchPlaceholder: "Cari nama...",
+          allStatus: "Semua Status",
+          allGen: "Semua Generasi",
+          showingCount: "Menunjukkan {{count}} ahli",
+          noResults: "Tiada ahli ditemui yang sepadan dengan carian anda.",
+          generation: "Gen {{gen}}",
+        },
       },
     },
 
@@ -260,6 +293,17 @@ i18n.use(initReactI18next).init({
           oshisama: "推し様",
           kikinarai: "気になる",
           chikasashi: "地下指し",
+        },
+
+        /* MEMBERS PAGE */
+        membersPage: {
+          title: "KLP48 メンバー名鑑",
+          searchPlaceholder: "名前を検索...",
+          allStatus: "すべてのステータス",
+          allGen: "すべての期",
+          showingCount: "{{count}} 人のメンバーを表示中",
+          noResults: "検索条件に一致するメンバーが見つかりませんでした。",
+          generation: "{{gen}} 期生",
         },
       },
     },

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { Globe, Star, Sparkles } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Globe, Star, Sparkles, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 import {
@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 
 import { members } from "../data/members";
 import { useRankStore } from "../store/useRankStore";
+import ProfileModal from "../components/ProfileModal";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ export default function Home() {
 
   const [status, setStatus] = useState("all");
   const [generation, setGeneration] = useState("all");
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
 
@@ -84,7 +86,15 @@ export default function Home() {
           </h1>
 
           {/* CENTER EMPTY */}
-          <div></div>
+          <div className="flex justify-center">
+            <Link 
+              to="/members" 
+              className="flex items-center gap-1.5 text-sm font-bold text-emerald-700 hover:text-emerald-500 transition px-4 py-2 bg-emerald-50/50 rounded-full"
+            >
+              <Users className="w-4 h-4" />
+              Members
+            </Link>
+          </div>
 
           {/* RIGHT LANGUAGE */}
           <div className="flex justify-end">
@@ -139,10 +149,11 @@ export default function Home() {
                 src={m.imageUrl}
                 alt={m.name}
                 title={m.fullName}
+                onClick={() => setSelectedProfile(m)}
                 onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                 initial={{ rotate: i % 2 === 0 ? -5 : 5 }}
-                whileHover={{ scale: 1, rotate: 0 }}
-                className="w-20 h-20 sm:w-24 sm:h-24 xl:w-28 xl:h-28 rounded-full border-4 border-white shadow-2xl ring-4 ring-emerald-300 ring-offset-2 bg-white"
+                whileHover={{ scale: 1.1, rotate: 0, zIndex: 10, cursor: 'pointer' }}
+                className="w-20 h-20 sm:w-24 sm:h-24 xl:w-28 xl:h-28 rounded-full border-4 border-white shadow-2xl ring-4 ring-emerald-300 ring-offset-2 bg-white relative"
               />
             ))}
           </div>
@@ -236,6 +247,13 @@ export default function Home() {
       <footer className="mt-20 py-6 text-center text-sm text-green-700">
         © 2026 <span className="font-semibold text-emerald-600">Malvin Evano</span> • Fan-made project
       </footer>
+
+      {/* Profile Modal */}
+      <ProfileModal 
+        member={selectedProfile} 
+        isOpen={!!selectedProfile} 
+        onClose={() => setSelectedProfile(null)} 
+      />
 
     </main>
   );

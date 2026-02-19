@@ -84,11 +84,13 @@ export default function Results() {
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
+    // Safari hack: call twice to prime the cache
+    if (isIOS) await toPng(ref.current, { cacheBust: true });
+
     const dataUrl = await toPng(ref.current, {
       cacheBust: true,
       pixelRatio: isIOS ? 1 : 2,
       backgroundColor: "#ffffff",
-      useCORS: true,
     });
 
     const link = document.createElement("a");
@@ -100,17 +102,25 @@ export default function Results() {
   /* ================= MODERN SHARE (iOS/Android Friendly) ================= */
   const handleShare = async () => {
     const top3Names = podium.map((m, i) => `${i + 1}. ${m.name}`).join("\n");
-    const shareText = `My KLP48 Oshi Ranking! 🏆\n\n${top3Names}\n\nCheck it out here:`;
     const shareUrl = window.location.origin;
+    // Append URL to text because many mobile apps ignore the 'url' field when sharing files
+    const shareText = `My KLP48 Oshi Ranking! 🏆\n\n${top3Names}\n\nCheck it out here: ${shareUrl}`;
 
     try {
+      if (!top3Ref.current) return;
+
       // 1. Generate the image blob
       await waitForImages(top3Ref.current);
+      
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      // Safari hack: prime the cache
+      if (isIOS) await toPng(top3Ref.current, { cacheBust: true });
+
+      // Safari/iOS workaround: Sometimes calling it twice or using a slight delay helps
       const dataUrl = await toPng(top3Ref.current, {
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#ffffff",
-        useCORS: true,
       });
 
       const response = await fetch(dataUrl);
@@ -123,12 +133,11 @@ export default function Results() {
           files: [file],
           title: "KLP48 Member Sorter",
           text: shareText,
-          url: shareUrl,
         });
       } else {
         // 3. Fallback to Twitter Web Intent (Desktop)
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-          shareText + " " + shareUrl
+          shareText
         )}`;
         window.open(twitterUrl, "_blank");
       }
@@ -207,7 +216,6 @@ export default function Results() {
                       <img
                         src={m.imageUrl}
                         alt={m.name}
-                        crossOrigin="anonymous"
                         onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                         className="w-full h-32 sm:h-64 object-cover bg-white"
                       />
@@ -232,7 +240,6 @@ export default function Results() {
                     <img
                       src={m.imageUrl}
                       alt={m.name}
-                      crossOrigin="anonymous"
                       onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                       className="w-full h-32 sm:h-40 object-cover bg-white"
                     />
@@ -306,7 +313,6 @@ export default function Results() {
                         <img
                           src={m.imageUrl}
                           alt={m.name}
-                          crossOrigin="anonymous"
                           onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                           className="w-full aspect-[3/4] object-cover rounded shadow bg-white"
                         />

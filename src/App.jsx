@@ -1,7 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Sorter from "./pages/Sorter"; // We'll create this next
+import Sorter from "./pages/Sorter"; 
 import Results from "./pages/Results";
+import Members from "./pages/Members";
 
 function App() {
   return (
@@ -9,7 +10,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/sorter" element={<Sorter />} />
       <Route path="/results" element={<Results />} />
-      
+      <Route path="/members" element={<Members />} />
     </Routes>
   );
 }
