@@ -97,6 +97,48 @@ export default function Results() {
     link.click();
   };
 
+  /* ================= MODERN SHARE (iOS/Android Friendly) ================= */
+  const handleShare = async () => {
+    const top3Names = podium.map((m, i) => `${i + 1}. ${m.name}`).join("\n");
+    const shareText = `My KLP48 Oshi Ranking! 🏆\n\n${top3Names}\n\nCheck it out here:`;
+    const shareUrl = window.location.origin;
+
+    try {
+      // 1. Generate the image blob
+      await waitForImages(top3Ref.current);
+      const dataUrl = await toPng(top3Ref.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+      });
+
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "KLP48-Ranking.png", { type: "image/png" });
+
+      // 2. Try Native Share (Works on iOS/Android/Chrome)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "KLP48 Member Sorter",
+          text: shareText,
+          url: shareUrl,
+        });
+      } else {
+        // 3. Fallback to Twitter Web Intent (Desktop)
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText + " " + shareUrl
+        )}`;
+        window.open(twitterUrl, "_blank");
+      }
+    } catch (error) {
+      console.error("Share failed", error);
+      // Basic fallback
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-3 py-6">
       <div className="max-w-6xl mx-auto">
@@ -207,25 +249,41 @@ export default function Results() {
               </div>
             </div>
 
-            {/* ===== EXPORT BUTTONS ===== */}
-            {/* <Card className="p-4 max-w-xl mx-auto mt-6">
+            {/* ===== EXPORT & SHARE BUTTONS ===== */}
+            <Card className="p-4 max-w-xl mx-auto mt-8 bg-white/80 backdrop-blur border-emerald-200">
+              <h3 className="text-center font-bold text-emerald-700 mb-4 flex items-center justify-center gap-2">
+                <ImageIcon className="w-5 h-5" />
+                {t("share")}
+              </h3>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => exportImage(top3Ref, "Top3.png")}
+                  className="border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                  onClick={() => exportImage(top3Ref, "KLP48-Top3.png")}
                 >
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Export Top 3
+                  {t("exportImage")}
                 </Button>
 
                 <Button
                   variant="outline"
-                  onClick={() => exportImage(fullRef, "FullRanking.png")}
+                  className="border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                  onClick={() => exportImage(fullRef, "KLP48-FullRanking.png")}
                 >
                   Export Full List
                 </Button>
+
+                <Button
+                  className="sm:col-span-2 bg-black hover:bg-zinc-800 text-white font-bold"
+                  onClick={handleShare}
+                >
+                  <svg className="w-4 h-4 mr-2 fill-current" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  {t("tweet")}
+                </Button>
               </div>
-            </Card> */}
+            </Card>
           </>
         )}
 
@@ -242,7 +300,7 @@ export default function Results() {
                     {tier.label}
                   </h3>
 
-                  <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
                     {tier.members.map((m) => (
                       <div key={m.id} className="text-center">
                         <img
@@ -252,7 +310,7 @@ export default function Results() {
                           onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                           className="w-full aspect-[3/4] object-cover rounded shadow bg-white"
                         />
-                        <div className="text-[10px] mt-1 truncate">
+                        <div className="text-[9px] sm:text-[10px] mt-1 font-semibold truncate px-1">
                           {m.name}
                         </div>
                       </div>
@@ -262,15 +320,28 @@ export default function Results() {
               ))}
             </div>
 
-            {/* <div className="text-center mt-5">
-              <Button
-                variant="outline"
-                onClick={() => exportImage(tierRef, "TierList.png")}
-              >
-                <ImageIcon className="w-4 h-4 mr-2" />
-                Export Tier List
-              </Button>
-            </div> */}
+            <Card className="p-4 max-w-xl mx-auto mt-8 bg-white/80 backdrop-blur border-emerald-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  className="border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                  onClick={() => exportImage(tierRef, "KLP48-TierList.png")}
+                >
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  {t("exportImage")}
+                </Button>
+
+                <Button
+                  className="bg-black hover:bg-zinc-800 text-white font-bold"
+                  onClick={handleShare}
+                >
+                   <svg className="w-4 h-4 mr-2 fill-current" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  {t("tweet")}
+                </Button>
+              </div>
+            </Card>
           </>
         )}
       </div>

@@ -17,6 +17,13 @@ export default function Sorter() {
   const { t } = useTranslation();
   const { members, setRanking } = useRankStore();
 
+  /* ---------- REDIRECT IF EMPTY ---------- */
+  useEffect(() => {
+    if (!members || members.length < 2) {
+      navigate("/");
+    }
+  }, [members, navigate]);
+
   const [stack, setStack] = useState([]);
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
