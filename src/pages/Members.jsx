@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowLeft, Users } from "lucide-react";
-import { motion } from "framer-motion";
+import { gsap } from "gsap";
 
 import { Input } from "@/components/ui/input";
 import {
@@ -27,6 +27,24 @@ export default function Members() {
   const [generation, setGeneration] = useState("all");
   const [selectedProfile, setSelectedProfile] = useState(null);
 
+  const headerRef = useRef(null);
+  const controlsRef = useRef(null);
+  const gridRef = useRef(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.from(headerRef.current, { y: -30, opacity: 0, duration: 0.6 })
+        .from(controlsRef.current, { y: 30, opacity: 0, duration: 0.6 }, "-=0.3");
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Re-stagger the grid every time the filter changes.
   const filtered = useMemo(() => {
     return members.filter((m) => {
       const q = search.toLowerCase();
@@ -39,6 +57,25 @@ export default function Members() {
     });
   }, [search, status, generation]);
 
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (!gridRef.current) return;
+    const cards = gridRef.current.children;
+    if (!cards.length) return;
+    gsap.fromTo(
+      cards,
+      { y: 24, opacity: 0, scale: 0.92, rotate: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.45,
+        ease: "back.out(1.4)",
+        stagger: { amount: Math.min(0.6, cards.length * 0.025) },
+      }
+    );
+  }, [filtered]);
+
   return (
     <div className="min-h-screen bg-kawaii text-ink relative overflow-hidden font-sans pb-12">
 
@@ -50,7 +87,7 @@ export default function Members() {
       <div aria-hidden="true" className="absolute bottom-1/4 left-[15%] text-xl text-sakura-400 animate-twinkle" style={{ animationDelay: "0.5s" }}>✦</div>
 
       {/* HEADER — sticker pill */}
-      <header className="sticky top-3 mx-3 sm:mx-6 z-40 mb-6">
+      <header ref={headerRef} className="sticky top-3 mx-3 sm:mx-6 z-40 mb-6">
         <div className="sticker bg-white max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center rounded-full">
           <button
             onClick={() => navigate("/")}
@@ -76,7 +113,7 @@ export default function Members() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
 
         {/* CONTROLS — sticker note */}
-        <section className="relative mb-10">
+        <section ref={controlsRef} className="relative mb-10">
           <div className="washi-tape -top-3 left-12 transform -rotate-6" />
           <div className="washi-tape -top-3 right-12 transform rotate-3" />
 
@@ -122,14 +159,11 @@ export default function Members() {
         </section>
 
         {/* GRID — polaroid cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-7">
+        <div ref={gridRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-7">
           {filtered.map((m, i) => (
-            <motion.button
+            <button
               key={m.id}
               onClick={() => setSelectedProfile(m)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i * 0.03, 0.6) }}
               className="polaroid w-full focus:outline-none text-left"
               style={{ "--tilt": `${(i % 2 === 0 ? -1 : 1) * (1 + (i % 3))}deg` }}
             >
@@ -149,7 +183,7 @@ export default function Members() {
                   Gen {m.generation}{m.status === "graduated" && " · 卒"}
                 </div>
               </div>
-            </motion.button>
+            </button>
           ))}
         </div>
 

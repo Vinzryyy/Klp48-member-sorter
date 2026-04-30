@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useReducer, useState, useCallback } from "react";
+import { useEffect, useReducer, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { gsap } from "gsap";
 import { useRankStore } from "../store/useRankStore";
 import { init, reducer } from "../lib/mergeSortMachine";
+import { useMagnetic } from "../lib/animations";
 
 import { ArrowLeft, RotateCcw, Undo2, Info } from "lucide-react";
 import ProfileModal from "../components/ProfileModal";
@@ -33,6 +35,47 @@ export default function Sorter() {
       navigate("/results");
     }
   }, [state.done, state.ranking, setRanking, navigate]);
+
+  const equalRef = useMagnetic({ strength: 0.25 });
+  const stageRef = useRef(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !stageRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.from(".sorter-controls > *", { y: -20, opacity: 0, stagger: 0.08, duration: 0.5 })
+        .from(".sorter-greet", { y: 12, opacity: 0, duration: 0.4 }, "-=0.2")
+        .from(".sorter-title .letter", {
+          y: 40, opacity: 0, rotate: -6,
+          stagger: 0.03, duration: 0.55, ease: "back.out(1.6)",
+        }, "-=0.2")
+        .from(".sorter-progress", { scaleX: 0, transformOrigin: "left center", duration: 0.6 }, "-=0.2")
+        .from(".sorter-left", { x: -80, opacity: 0, rotate: -8, duration: 0.7, ease: "back.out(1.4)" }, "-=0.3")
+        .from(".sorter-right", { x: 80, opacity: 0, rotate: 8, duration: 0.7, ease: "back.out(1.4)" }, "<")
+        .from(".sorter-vs", { scale: 0, opacity: 0, rotate: 180, duration: 0.6, ease: "back.out(2)" }, "-=0.4")
+        .from(".sorter-equal", { y: 20, opacity: 0, duration: 0.4 }, "-=0.3")
+        .from(".sorter-hint", { opacity: 0, duration: 0.4 }, "-=0.2");
+    }, stageRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Animate card swap when the pair changes
+  const pairKey = `${state.left[0]?.id ?? ""}-${state.right[0]?.id ?? ""}`;
+  useEffect(() => {
+    if (!stageRef.current) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        [".sorter-left", ".sorter-right"],
+        { scale: 0.92, opacity: 0.5 },
+        { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.6)", stagger: 0.05 }
+      );
+    }, stageRef);
+    return () => ctx.revert();
+  }, [pairKey]);
 
   if (members.length < 2) {
     return (
@@ -69,10 +112,10 @@ export default function Sorter() {
       <div aria-hidden="true" className="absolute top-32 right-[10%] text-2xl text-emerald-500 animate-twinkle" style={{ animationDelay: "1s" }}>✦</div>
       <div aria-hidden="true" className="absolute bottom-16 left-[12%] text-2xl text-sakura-400 animate-twinkle" style={{ animationDelay: "0.5s" }}>✦</div>
 
-      <div className="max-w-6xl mx-auto relative z-10 px-4 pt-6">
+      <div ref={stageRef} className="max-w-6xl mx-auto relative z-10 px-4 pt-6">
 
         {/* TOP CONTROL BAR */}
-        <div className="flex justify-between items-center flex-wrap gap-3 mb-6">
+        <div className="sorter-controls flex justify-between items-center flex-wrap gap-3 mb-6">
           <button
             onClick={() => navigate("/")}
             className="btn-pop bg-white px-4 py-2 rounded-full text-sm font-kawaii font-bold text-ink flex items-center gap-1.5"
@@ -103,13 +146,17 @@ export default function Sorter() {
 
         {/* TITLE */}
         <div className="text-center mb-6 space-y-2">
-          <div className="font-script text-xl text-sakura-600">choose your fave ♡</div>
-          <h1 className="font-kawaii font-bold text-3xl sm:text-5xl text-emerald-600 squiggle-underline drop-shadow-[3px_3px_0_#be185d] inline-block">
-            {t("chooseOne")}
+          <div className="sorter-greet font-script text-xl text-sakura-600">choose your fave ♡</div>
+          <h1 className="sorter-title font-kawaii font-bold text-3xl sm:text-5xl text-emerald-600 squiggle-underline drop-shadow-[3px_3px_0_#be185d] inline-block">
+            {t("chooseOne").split("").map((ch, i) => (
+              <span key={i} className="letter inline-block">
+                {ch === " " ? " " : ch}
+              </span>
+            ))}
           </h1>
 
           {/* Progress as chunky sticker frame */}
-          <div className="max-w-md mx-auto pt-3">
+          <div className="sorter-progress max-w-md mx-auto pt-3">
             <div className="sticker bg-white p-2 rounded-full">
               <div className="bg-cream-deep rounded-full h-3 overflow-hidden">
                 <div
@@ -128,18 +175,19 @@ export default function Sorter() {
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
 
           {/* LEFT POLAROID */}
-          <ComparisonCard
-            member={L}
-            tilt={-3}
-            order="order-1"
-            onPick={() => dispatch({ type: "PICK_LEFT" })}
-            onInfo={() => setSelectedProfile(L)}
-            t={t}
-          />
+          <div className="sorter-left order-1">
+            <ComparisonCard
+              member={L}
+              tilt={-3}
+              onPick={() => dispatch({ type: "PICK_LEFT" })}
+              onInfo={() => setSelectedProfile(L)}
+              t={t}
+            />
+          </div>
 
           {/* CENTER */}
           <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex flex-col items-center justify-center gap-5">
-            <div className="relative">
+            <div className="sorter-vs relative">
               <div className="absolute inset-0 bg-sakura-300 rounded-full blur-2xl scale-150 opacity-60" />
               <div className="relative font-kawaii font-bold text-7xl sm:text-8xl text-emerald-600 drop-shadow-[5px_5px_0_#be185d] animate-float">
                 VS
@@ -147,26 +195,28 @@ export default function Sorter() {
             </div>
 
             <button
+              ref={equalRef}
               onClick={() => dispatch({ type: "PICK_TIE" })}
-              className="btn-pop-pink bg-gradient-to-r from-sakura-300 to-sakura-500 px-8 py-4 text-lg font-kawaii font-bold rounded-full text-white"
+              className="sorter-equal btn-pop-pink bg-gradient-to-r from-sakura-300 to-sakura-500 px-8 py-4 text-lg font-kawaii font-bold rounded-full text-white"
             >
               ⚖️ {t("equal")}
             </button>
 
-            <p className="font-script text-base text-ink/50">
+            <p className="sorter-hint font-script text-base text-ink/50">
               can't decide? tap equal
             </p>
           </div>
 
           {/* RIGHT POLAROID */}
-          <ComparisonCard
-            member={R}
-            tilt={3}
-            order="order-2 lg:order-3"
-            onPick={() => dispatch({ type: "PICK_RIGHT" })}
-            onInfo={() => setSelectedProfile(R)}
-            t={t}
-          />
+          <div className="sorter-right order-2 lg:order-3">
+            <ComparisonCard
+              member={R}
+              tilt={3}
+              onPick={() => dispatch({ type: "PICK_RIGHT" })}
+              onInfo={() => setSelectedProfile(R)}
+              t={t}
+            />
+          </div>
         </div>
       </div>
 
@@ -183,9 +233,9 @@ export default function Sorter() {
   );
 }
 
-function ComparisonCard({ member, tilt, order, onPick, onInfo, t }) {
+function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
   return (
-    <div className={`${order} relative`}>
+    <div className="relative">
       <button
         onClick={onPick}
         className="polaroid w-full block focus:outline-none"

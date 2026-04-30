@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toPng } from "html-to-image";
+import { gsap } from "gsap";
 import { useRankStore } from "../store/useRankStore";
 
 import { ArrowLeft, Image as ImageIcon, Crown, Trophy, Medal } from "lucide-react";
@@ -46,6 +47,55 @@ export default function Results() {
   const top3Ref = useRef(null);
   const fullRef = useRef(null);
   const tierRef = useRef(null);
+  const stageRef = useRef(null);
+
+  // Entrance choreography — fires once on mount.
+  useEffect(() => {
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !stageRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.from(".results-greet", { y: 14, opacity: 0, duration: 0.5 })
+        .from(".results-title .letter", {
+          y: 50, opacity: 0, rotate: -6,
+          stagger: 0.04, duration: 0.65, ease: "back.out(1.7)",
+        }, "-=0.2")
+        .from(".results-controls > *", { y: -20, opacity: 0, stagger: 0.08, duration: 0.45 }, "-=0.3");
+    }, stageRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Re-animate the active view (ranking/tier) every time it changes.
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (!stageRef.current) return;
+
+    const ctx = gsap.context(() => {
+      if (view === "ranking") {
+        const tl = gsap.timeline({ defaults: { ease: "back.out(1.4)" } });
+        tl.fromTo(
+          ".podium-card",
+          { y: 80, opacity: 0, rotate: 0, scale: 0.85 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.7, stagger: 0.15 }
+        ).fromTo(
+          ".rest-card",
+          { y: 30, opacity: 0, scale: 0.9 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.03, ease: "power2.out" },
+          "-=0.4"
+        );
+      } else {
+        gsap.fromTo(
+          ".tier-row",
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power3.out" }
+        );
+      }
+    }, stageRef);
+
+    return () => ctx.revert();
+  }, [view, ranking]);
 
   if (!ranking.length) {
     return (
@@ -154,18 +204,22 @@ export default function Results() {
       <div aria-hidden="true" className="absolute top-32 right-[10%] text-2xl text-sakura-500 animate-twinkle" style={{ animationDelay: "1s" }}>✦</div>
       <div aria-hidden="true" className="absolute bottom-1/4 left-[12%] text-2xl text-emerald-500 animate-twinkle" style={{ animationDelay: "0.5s" }}>✦</div>
 
-      <div className="max-w-6xl mx-auto relative z-10 px-4 pt-6">
+      <div ref={stageRef} className="max-w-6xl mx-auto relative z-10 px-4 pt-6">
 
         {/* TITLE */}
         <div className="text-center mb-6 space-y-1">
-          <div className="font-script text-xl text-sakura-600">your oshi ranking ♡</div>
-          <h1 className="font-kawaii font-bold text-3xl sm:text-5xl text-emerald-600 squiggle-underline drop-shadow-[3px_3px_0_#be185d] inline-block">
-            🏆 My Top 3 Oshi
+          <div className="results-greet font-script text-xl text-sakura-600">your oshi ranking ♡</div>
+          <h1 className="results-title font-kawaii font-bold text-3xl sm:text-5xl text-emerald-600 squiggle-underline drop-shadow-[3px_3px_0_#be185d] inline-block">
+            {"🏆 My Top 3 Oshi".split("").map((ch, i) => (
+              <span key={i} className="letter inline-block">
+                {ch === " " ? " " : ch}
+              </span>
+            ))}
           </h1>
         </div>
 
         {/* HEADER CONTROLS */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+        <div className="results-controls flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
           <button
             onClick={() => navigate("/")}
             className="btn-pop bg-white px-4 py-2 rounded-full text-sm font-kawaii font-bold text-ink flex items-center gap-1.5"
@@ -220,7 +274,7 @@ export default function Results() {
                     return (
                       <div
                         key={m.id}
-                        className="flex flex-col items-center gap-2"
+                        className="podium-card flex flex-col items-center gap-2"
                         style={{ order: orders[i] }}
                       >
                         <div className={`relative polaroid w-full ${i === 0 ? "ring-gold" : i === 1 ? "ring-silver" : "ring-bronze"}`}
@@ -257,7 +311,7 @@ export default function Results() {
                 {rest.map((m, i) => (
                   <div
                     key={m.id}
-                    className="polaroid relative"
+                    className="rest-card polaroid relative"
                     style={{ "--tilt": `${(i % 2 === 0 ? -1 : 1) * (1 + (i % 3))}deg` }}
                   >
                     <div className="absolute -top-2 -left-2 z-10 bg-white border-2 border-ink rounded-full w-8 h-8 flex items-center justify-center font-kawaii font-bold text-xs shadow-[2px_2px_0_#064e3b]">
@@ -329,7 +383,7 @@ export default function Results() {
                 return (
                   <div
                     key={tier.key}
-                    className={`sticker rounded-3xl p-4 sm:p-5 ${palette.bg}`}
+                    className={`tier-row sticker rounded-3xl p-4 sm:p-5 ${palette.bg}`}
                   >
                     <h3 className={`font-kawaii font-bold text-lg sm:text-xl mb-3 flex items-center gap-2 ${palette.accent}`}>
                       <span className="text-2xl">{palette.icon}</span>

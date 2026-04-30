@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { Globe, Star, Users, Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { gsap } from "gsap";
 
 import {
   Select,
@@ -16,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { members } from "../data/members";
 import { useRankStore } from "../store/useRankStore";
 import { shuffle } from "../lib/shuffle";
+import { useMagnetic } from "../lib/animations";
 import ProfileModal from "../components/ProfileModal";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
@@ -29,6 +31,63 @@ export default function Home() {
   const [generation, setGeneration] = useState("all");
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [error, setError] = useState("");
+
+  // GSAP entrance choreography
+  const heroRef = useRef(null);
+  const polaroidRowRef = useRef(null);
+  const filterCardRef = useRef(null);
+  const ctaRef = useMagnetic({ strength: 0.25 });
+  const ctaPinkRef = useMagnetic({ strength: 0.25 });
+
+  useEffect(() => {
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.from(".hero-greet", { y: 16, opacity: 0, duration: 0.5 })
+        .from(".hero-title .letter", {
+          y: 50,
+          opacity: 0,
+          rotate: -6,
+          stagger: 0.04,
+          duration: 0.7,
+          ease: "back.out(1.7)",
+        }, "-=0.2")
+        .from(".hero-badge", { scale: 0.6, opacity: 0, duration: 0.5, ease: "back.out(2)" }, "-=0.4")
+        .from(".hero-desc", { y: 12, opacity: 0, duration: 0.5 }, "-=0.3")
+        .from(polaroidRowRef.current?.children ?? [], {
+          y: 60,
+          opacity: 0,
+          rotate: 0,
+          stagger: 0.08,
+          duration: 0.7,
+          ease: "back.out(1.4)",
+        }, "-=0.2")
+        .from(".hero-cta-row > *", {
+          y: 20,
+          opacity: 0,
+          stagger: 0.1,
+          duration: 0.5,
+        }, "-=0.3")
+        .from(".hero-stats > *", {
+          y: 12,
+          opacity: 0,
+          stagger: 0.06,
+          duration: 0.4,
+        }, "-=0.4")
+        .from(filterCardRef.current, {
+          x: 60,
+          opacity: 0,
+          rotate: 8,
+          duration: 0.8,
+          ease: "back.out(1.4)",
+        }, "-=0.9");
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     if (error) setError("");
@@ -143,53 +202,41 @@ export default function Home() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 sm:px-6 relative z-10 pt-4 pb-20">
 
         {/* LEFT HERO */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="lg:col-span-7 space-y-8"
-        >
+        <section ref={heroRef} className="lg:col-span-7 space-y-8">
           {/* Greeting note in handwritten script */}
-          <motion.div
-            initial={{ opacity: 0, x: -20, rotate: -3 }}
-            animate={{ opacity: 1, x: 0, rotate: -3 }}
-            transition={{ delay: 0.4 }}
-            className="inline-block font-script text-xl sm:text-2xl text-sakura-600"
-          >
+          <div className="hero-greet inline-block font-script text-xl sm:text-2xl text-sakura-600 -rotate-3">
             hi, oshi-hunter ♡
-          </motion.div>
+          </div>
 
-          {/* TITLE */}
+          {/* TITLE — per-letter spans for GSAP letter stagger */}
           <div className="space-y-2">
-            <h1 className="font-kawaii font-bold leading-[0.95] text-5xl sm:text-7xl xl:text-8xl tracking-tight">
+            <h1 className="hero-title font-kawaii font-bold leading-[0.95] text-5xl sm:text-7xl xl:text-8xl tracking-tight">
               <span className="inline-block squiggle-underline text-emerald-600 drop-shadow-[4px_4px_0_#be185d]">
-                {t("title")}
+                {t("title").split("").map((ch, i) => (
+                  <span key={i} className="letter inline-block">
+                    {ch === " " ? " " : ch}
+                  </span>
+                ))}
               </span>
             </h1>
           </div>
 
           {/* Subtitle as rotated sticker badge */}
-          <motion.span
-            whileHover={{ rotate: 0, scale: 1.05 }}
-            className="inline-block sticker-pink px-4 py-2 text-sm font-kawaii font-bold text-sakura-700 transform -rotate-2"
-          >
+          <span className="hero-badge inline-block sticker-pink px-4 py-2 text-sm font-kawaii font-bold text-sakura-700 transform -rotate-2">
             🌸 {t("subtitle")}
-          </motion.span>
+          </span>
 
-          <p className="text-lg text-ink/80 max-w-xl leading-relaxed">
+          <p className="hero-desc text-lg text-ink/80 max-w-xl leading-relaxed">
             {t("description")}
           </p>
 
           {/* Polaroid avatars */}
-          <div className="flex items-end flex-wrap gap-3 sm:gap-4 pt-4">
+          <div ref={polaroidRowRef} className="flex items-end flex-wrap gap-3 sm:gap-4 pt-4">
             {randomMembers.map((m, i) => (
-              <motion.button
+              <button
                 key={m.id}
                 onClick={() => setSelectedProfile(m)}
                 title={m.fullName}
-                initial={{ opacity: 0, y: 30, rotate: 0 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.08, type: "spring", stiffness: 180 }}
                 className="polaroid w-20 sm:w-24 xl:w-28 cursor-pointer focus:outline-none"
                 style={{ "--tilt": `${(i % 2 === 0 ? -1 : 1) * (3 + (i % 3) * 2)}deg` }}
               >
@@ -202,13 +249,14 @@ export default function Home() {
                 <div className="absolute bottom-1 left-0 right-0 text-center font-script text-sm text-ink truncate px-2">
                   {m.name}
                 </div>
-              </motion.button>
+              </button>
             ))}
           </div>
 
           {/* CTA row */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center pt-4">
+          <div className="hero-cta-row flex flex-col sm:flex-row gap-4 items-start sm:items-center pt-4">
             <button
+              ref={ctaRef}
               onClick={handleStart}
               className="btn-pop bg-gradient-to-r from-emerald-300 to-emerald-500 px-8 py-4 text-lg font-kawaii font-bold rounded-full text-white"
             >
@@ -222,7 +270,7 @@ export default function Home() {
           </div>
 
           {/* Stats row as sticker chips */}
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="hero-stats flex flex-wrap gap-3 pt-2">
             <span className="sticker-pink bg-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-sakura-700">
               🎤 {members.length} {t("members")}
             </span>
@@ -233,16 +281,11 @@ export default function Home() {
               💿 {t("active")}
             </span>
           </div>
-        </motion.section>
+        </section>
 
         {/* RIGHT FILTER — sticker note with washi tape */}
-        <motion.aside
-          initial={{ opacity: 0, y: 30, rotate: 2 }}
-          animate={{ opacity: 1, y: 0, rotate: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="lg:col-span-5 flex justify-center pt-8 lg:pt-16"
-        >
-          <div className="relative w-full sm:max-w-md">
+        <aside className="lg:col-span-5 flex justify-center pt-8 lg:pt-16">
+          <div ref={filterCardRef} className="relative w-full sm:max-w-md">
             {/* Washi tape strips */}
             <div className="washi-tape -top-3 left-8 transform -rotate-6" />
             <div className="washi-tape -top-3 right-8 transform rotate-3" />
@@ -296,6 +339,7 @@ export default function Home() {
 
               {/* START BUTTON — pink pop */}
               <button
+                ref={ctaPinkRef}
                 onClick={handleStart}
                 className="btn-pop-pink w-full h-14 rounded-full bg-gradient-to-r from-sakura-300 to-sakura-500 text-white font-kawaii font-bold text-lg"
               >
@@ -314,7 +358,7 @@ export default function Home() {
               )}
             </div>
           </div>
-        </motion.aside>
+        </aside>
       </div>
 
       {/* FOOTER */}
