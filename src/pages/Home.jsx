@@ -18,6 +18,7 @@ import { members } from "../data/members";
 import { useRankStore } from "../store/useRankStore";
 import { shuffle } from "../lib/shuffle";
 import { useMagnetic } from "../lib/animations";
+import SplitTitle from "../components/SplitTitle";
 import ProfileModal from "../components/ProfileModal";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
@@ -161,16 +162,16 @@ export default function Home() {
 
       {/* HEADER — chunky sticker bar */}
       <header className="sticky top-3 mx-3 sm:mx-6 z-50 mb-6">
-        <div className="sticker bg-white max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center rounded-full">
+        <div className="sticker bg-white max-w-7xl mx-auto px-3 sm:px-4 py-3 grid grid-cols-3 items-center rounded-full gap-2">
 
           {/* Logo */}
-          <Link to="/" className="font-kawaii font-bold text-base sm:text-lg text-ink flex items-center gap-2">
-            <span className="text-2xl">🍀</span>
-            <span className="hidden sm:inline">KLP48 Sorter</span>
+          <Link to="/" className="font-kawaii font-bold text-sm sm:text-lg text-ink flex items-center gap-2 min-w-0">
+            <span className="text-xl sm:text-2xl flex-shrink-0">🍀</span>
+            <span className="hidden sm:inline truncate">KLP48 Sorter</span>
           </Link>
 
           {/* Members nav as chunky tag */}
-          <div className="flex justify-center">
+          <div className="flex justify-center min-w-0">
             <Link
               to="/members"
               className="btn-pop bg-sakura-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-4 py-2 rounded-full"
@@ -181,9 +182,9 @@ export default function Home() {
           </div>
 
           {/* Language */}
-          <div className="flex justify-end">
+          <div className="flex justify-end min-w-0">
             <Select value={i18n.language} onValueChange={changeLanguage}>
-              <SelectTrigger className="h-9 px-3 rounded-full border-2 border-ink bg-white flex items-center gap-2 text-sm font-kawaii font-bold text-ink shadow-[2px_2px_0_#064e3b]">
+              <SelectTrigger className="h-9 px-2 sm:px-3 rounded-full border-2 border-ink bg-white flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-kawaii font-bold text-ink shadow-[2px_2px_0_#064e3b]">
                 <Globe className="w-4 h-4 text-emerald-600" />
                 <SelectValue />
               </SelectTrigger>
@@ -210,13 +211,9 @@ export default function Home() {
 
           {/* TITLE — per-letter spans for GSAP letter stagger */}
           <div className="space-y-2">
-            <h1 className="hero-title font-kawaii font-bold leading-[0.95] text-5xl sm:text-7xl xl:text-8xl tracking-tight">
+            <h1 className="hero-title font-kawaii font-bold leading-[0.95] text-4xl sm:text-6xl xl:text-7xl tracking-tight break-words">
               <span className="inline-block squiggle-underline text-emerald-600 drop-shadow-[4px_4px_0_#be185d]">
-                {t("title").split("").map((ch, i) => (
-                  <span key={i} className="letter inline-block">
-                    {ch === " " ? " " : ch}
-                  </span>
-                ))}
+                <SplitTitle text={t("title")} />
               </span>
             </h1>
           </div>

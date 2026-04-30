@@ -7,6 +7,7 @@ import { init, reducer } from "../lib/mergeSortMachine";
 import { useMagnetic } from "../lib/animations";
 
 import { ArrowLeft, RotateCcw, Undo2, Info } from "lucide-react";
+import SplitTitle from "../components/SplitTitle";
 import ProfileModal from "../components/ProfileModal";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
@@ -115,12 +116,12 @@ export default function Sorter() {
       <div ref={stageRef} className="max-w-6xl mx-auto relative z-10 px-4 pt-6">
 
         {/* TOP CONTROL BAR */}
-        <div className="sorter-controls flex justify-between items-center flex-wrap gap-3 mb-6">
+        <div className="sorter-controls flex justify-between items-center flex-wrap gap-2 sm:gap-3 mb-6">
           <button
             onClick={() => navigate("/")}
-            className="btn-pop bg-white px-4 py-2 rounded-full text-sm font-kawaii font-bold text-ink flex items-center gap-1.5"
+            className="btn-pop bg-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-kawaii font-bold text-ink flex items-center gap-1.5"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 flex-shrink-0" />
             {t("back")}
           </button>
 
@@ -128,17 +129,17 @@ export default function Sorter() {
             <button
               onClick={() => dispatch({ type: "UNDO" })}
               disabled={!state.history.length}
-              className="btn-pop bg-white px-4 py-2 rounded-full text-sm font-kawaii font-bold text-ink flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-pop bg-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-kawaii font-bold text-ink flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <Undo2 className="h-4 w-4" />
+              <Undo2 className="h-4 w-4 flex-shrink-0" />
               {t("undo")}
             </button>
 
             <button
               onClick={restart}
-              className="btn-pop-pink bg-white px-4 py-2 rounded-full text-sm font-kawaii font-bold text-sakura-700 flex items-center gap-1.5"
+              className="btn-pop-pink bg-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-kawaii font-bold text-sakura-700 flex items-center gap-1.5"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4 flex-shrink-0" />
               {t("restart")}
             </button>
           </div>
@@ -147,12 +148,8 @@ export default function Sorter() {
         {/* TITLE */}
         <div className="text-center mb-6 space-y-2">
           <div className="sorter-greet font-script text-xl text-sakura-600">choose your fave ♡</div>
-          <h1 className="sorter-title font-kawaii font-bold text-3xl sm:text-5xl text-emerald-600 squiggle-underline drop-shadow-[3px_3px_0_#be185d] inline-block">
-            {t("chooseOne").split("").map((ch, i) => (
-              <span key={i} className="letter inline-block">
-                {ch === " " ? " " : ch}
-              </span>
-            ))}
+          <h1 className="sorter-title font-kawaii font-bold text-2xl sm:text-4xl md:text-5xl text-emerald-600 squiggle-underline drop-shadow-[2px_2px_0_#be185d] sm:drop-shadow-[3px_3px_0_#be185d] inline-block break-words px-2">
+            <SplitTitle text={t("chooseOne")} />
           </h1>
 
           {/* Progress as chunky sticker frame */}
@@ -189,7 +186,7 @@ export default function Sorter() {
           <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex flex-col items-center justify-center gap-5">
             <div className="sorter-vs relative">
               <div className="absolute inset-0 bg-sakura-300 rounded-full blur-2xl scale-150 opacity-60" />
-              <div className="relative font-kawaii font-bold text-7xl sm:text-8xl text-emerald-600 drop-shadow-[5px_5px_0_#be185d] animate-float">
+              <div className="relative font-kawaii font-bold text-6xl sm:text-7xl lg:text-8xl text-emerald-600 drop-shadow-[3px_3px_0_#be185d] sm:drop-shadow-[5px_5px_0_#be185d] animate-float">
                 VS
               </div>
             </div>

@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { useRankStore } from "../store/useRankStore";
 
 import { ArrowLeft, Image as ImageIcon, Crown, Trophy, Medal } from "lucide-react";
+import SplitTitle from "../components/SplitTitle";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
 
@@ -209,12 +210,8 @@ export default function Results() {
         {/* TITLE */}
         <div className="text-center mb-6 space-y-1">
           <div className="results-greet font-script text-xl text-sakura-600">your oshi ranking ♡</div>
-          <h1 className="results-title font-kawaii font-bold text-3xl sm:text-5xl text-emerald-600 squiggle-underline drop-shadow-[3px_3px_0_#be185d] inline-block">
-            {"🏆 My Top 3 Oshi".split("").map((ch, i) => (
-              <span key={i} className="letter inline-block">
-                {ch === " " ? " " : ch}
-              </span>
-            ))}
+          <h1 className="results-title font-kawaii font-bold text-2xl sm:text-4xl md:text-5xl text-emerald-600 squiggle-underline drop-shadow-[2px_2px_0_#be185d] sm:drop-shadow-[3px_3px_0_#be185d] inline-block break-words px-2">
+            <SplitTitle text={"🏆 My Top 3 Oshi"} />
           </h1>
         </div>
 
@@ -265,7 +262,7 @@ export default function Results() {
                   Top 3 ⭐
                 </h2>
 
-                <div className="grid grid-cols-3 gap-3 sm:gap-6 items-end">
+                <div className="grid grid-cols-3 gap-2 sm:gap-6 items-end">
                   {podium.map((m, i) => {
                     const Icon = podiumIcons[i];
                     const tilts = [-2, 2, -3];
@@ -279,10 +276,10 @@ export default function Results() {
                       >
                         <div className={`relative polaroid w-full ${i === 0 ? "ring-gold" : i === 1 ? "ring-silver" : "ring-bronze"}`}
                              style={{ "--tilt": `${tilts[i]}deg` }}>
-                          <div className="absolute -top-3 -left-3 z-10 bg-white border-2 border-ink rounded-full w-10 h-10 flex items-center justify-center font-kawaii font-bold text-lg shadow-[2px_2px_0_#064e3b]">
+                          <div className="absolute -top-2 -left-2 sm:-top-3 sm:-left-3 z-10 bg-white border-2 border-ink rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center font-kawaii font-bold text-[10px] sm:text-lg shadow-[2px_2px_0_#064e3b]">
                             #{i + 1}
                           </div>
-                          <Icon className={`absolute -top-3 -right-3 z-10 w-9 h-9 p-1.5 bg-white border-2 border-ink rounded-full shadow-[2px_2px_0_#064e3b] ${
+                          <Icon className={`absolute -top-2 -right-2 sm:-top-3 sm:-right-3 z-10 w-6 h-6 sm:w-9 sm:h-9 p-1 sm:p-1.5 bg-white border-2 border-ink rounded-full shadow-[2px_2px_0_#064e3b] ${
                             i === 0 ? "text-amber-500" : i === 1 ? "text-slate-500" : "text-orange-600"
                           }`} />
                           <img

@@ -28,8 +28,8 @@ export default function ProfileModal({ member, isOpen, onClose }) {
             className="relative w-full max-w-lg sticker bg-cream rounded-3xl overflow-hidden font-sans"
           >
             {/* Washi tape */}
-            <div className="washi-tape -top-3 left-12 transform -rotate-6 z-30" />
-            <div className="washi-tape -top-3 right-12 transform rotate-3 z-30" />
+            <div className="washi-tape -top-3 left-6 sm:left-12 transform -rotate-6 z-30" />
+            <div className="washi-tape -top-3 right-6 sm:right-12 transform rotate-3 z-30" />
 
             {/* Close */}
             <button

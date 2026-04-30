@@ -139,14 +139,14 @@ export default function Preloader({ ready = true, onDone }) {
           className="font-kawaii font-bold leading-[0.9] tracking-tight"
           aria-label="KLP48 Sorter"
         >
-          <span className="block text-5xl sm:text-7xl text-emerald-600 drop-shadow-[3px_3px_0_#be185d]">
+          <span className="block text-4xl sm:text-6xl md:text-7xl text-emerald-600 drop-shadow-[2px_2px_0_#be185d] sm:drop-shadow-[3px_3px_0_#be185d] whitespace-nowrap">
             {word1.map((ch, i) => (
               <span key={`w1-${i}`} className="letter inline-block">
                 {ch}
               </span>
             ))}
           </span>
-          <span className="block text-4xl sm:text-6xl text-sakura-500 squiggle-underline mt-1">
+          <span className="block text-3xl sm:text-5xl md:text-6xl text-sakura-500 squiggle-underline mt-1 whitespace-nowrap">
             {word2.map((ch, i) => (
               <span key={`w2-${i}`} className="letter inline-block">
                 {ch}

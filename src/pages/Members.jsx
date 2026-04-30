@@ -88,21 +88,21 @@ export default function Members() {
 
       {/* HEADER — sticker pill */}
       <header ref={headerRef} className="sticky top-3 mx-3 sm:mx-6 z-40 mb-6">
-        <div className="sticker bg-white max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center rounded-full">
+        <div className="sticker bg-white max-w-7xl mx-auto px-3 sm:px-4 py-3 grid grid-cols-3 items-center rounded-full gap-2">
           <button
             onClick={() => navigate("/")}
-            className="btn-pop bg-cream px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-ink flex items-center gap-1.5 w-fit"
+            className="btn-pop bg-cream px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-ink flex items-center gap-1.5 w-fit min-w-0"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 flex-shrink-0" />
             <span className="hidden sm:inline">{t("back")}</span>
           </button>
 
-          <h1 className="font-kawaii font-bold text-base sm:text-xl text-emerald-700 flex items-center justify-center gap-2">
-            <Users className="w-5 h-5" />
-            <span>{t("membersPage.title")}</span>
+          <h1 className="font-kawaii font-bold text-sm sm:text-xl text-emerald-700 flex items-center justify-center gap-2 min-w-0">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span className="truncate">{t("membersPage.title")}</span>
           </h1>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end min-w-0">
             <span className="sticker-pink bg-white px-3 py-1 rounded-full text-xs sm:text-sm font-kawaii font-bold text-sakura-700">
               {filtered.length}
             </span>
