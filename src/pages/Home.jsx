@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 
 import { members } from "../data/members";
 import { useRankStore } from "../store/useRankStore";
+import { shuffle } from "../lib/shuffle";
 import ProfileModal from "../components/ProfileModal";
 
 export default function Home() {
@@ -48,10 +49,7 @@ export default function Home() {
 
   // Random avatars
   const randomMembers = useMemo(() => {
-    return members
-      .filter((m) => m.status === "active")
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 6);
+    return shuffle(members.filter((m) => m.status === "active")).slice(0, 6);
   }, []);
 
   const handleStart = () => {

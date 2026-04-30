@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useRankStore } from "../store/useRankStore";
+import { shuffle } from "../lib/shuffle";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,7 +37,7 @@ export default function Sorter() {
   /* ---------- INIT (FIXED) ---------- */
   const initSorter = useCallback(() => {
     if (members.length < 2) return;
-    const shuffled = [...members].sort(() => Math.random() - 0.5);
+    const shuffled = shuffle(members);
     setStack(shuffled.map((m) => [m]));
     setLeft([]);
     setRight([]);
