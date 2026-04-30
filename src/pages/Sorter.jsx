@@ -242,6 +242,9 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
         <img
           src={member.imageUrl}
           alt={member.name}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
           onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
           className="w-full h-[220px] sm:h-[300px] lg:h-[440px] object-cover bg-cream"
         />

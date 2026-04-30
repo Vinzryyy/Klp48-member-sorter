@@ -47,6 +47,8 @@ export default function ProfileModal({ member, isOpen, onClose }) {
                   <img
                     src={member.imageUrl}
                     alt={member.name}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                     className="w-full aspect-[3/4] object-cover bg-cream"
                   />

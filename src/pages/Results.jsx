@@ -129,6 +129,11 @@ export default function Results() {
 
   const waitForImages = async (element) => {
     const images = element.querySelectorAll("img");
+    // Flip any lazy images to eager so they actually start loading before
+    // html-to-image serializes the DOM.
+    images.forEach((img) => {
+      if (img.loading === "lazy") img.loading = "eager";
+    });
     await Promise.all(
       Array.from(images).map(
         (img) =>
@@ -285,6 +290,8 @@ export default function Results() {
                           <img
                             src={m.imageUrl}
                             alt={m.name}
+                            loading="eager"
+                            decoding="async"
                             onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                             className={`w-full h-32 ${heights[i]} object-cover bg-cream`}
                           />
@@ -317,6 +324,8 @@ export default function Results() {
                     <img
                       src={m.imageUrl}
                       alt={m.name}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                       className="w-full h-32 sm:h-40 object-cover bg-cream"
                     />
@@ -400,6 +409,8 @@ export default function Results() {
                           <img
                             src={m.imageUrl}
                             alt={m.name}
+                            loading="lazy"
+                            decoding="async"
                             onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                             className="w-full aspect-[3/4] object-cover bg-cream"
                           />

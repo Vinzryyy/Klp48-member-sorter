@@ -240,6 +240,8 @@ export default function Home() {
                 <img
                   src={m.imageUrl}
                   alt={m.name}
+                  loading="eager"
+                  decoding="async"
                   onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
                   className="w-full aspect-square object-cover bg-cream"
                 />
