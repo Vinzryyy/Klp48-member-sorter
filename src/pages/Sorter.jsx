@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useReducer, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useRankStore } from "../store/useRankStore";
-import { shuffle } from "../lib/shuffle";
+import { init, reducer } from "../lib/mergeSortMachine";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,9 +11,6 @@ import ProfileModal from "../components/ProfileModal";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
 
-/**
- * Interactive Merge Sort (FULL RANKING, WITH UNDO)
- */
 export default function Sorter() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -26,102 +23,20 @@ export default function Sorter() {
     }
   }, [members, navigate]);
 
-  const [stack, setStack] = useState([]);
-  const [left, setLeft] = useState([]);
-  const [right, setRight] = useState([]);
-  const [merged, setMerged] = useState([]);
-  const [comparisons, setComparisons] = useState(0); 
-  const [history, setHistory] = useState([]);
+  const [state, dispatch] = useReducer(reducer, members, init);
   const [selectedProfile, setSelectedProfile] = useState(null);
 
-  /* ---------- INIT (FIXED) ---------- */
-  const initSorter = useCallback(() => {
-    if (members.length < 2) return;
-    const shuffled = shuffle(members);
-    setStack(shuffled.map((m) => [m]));
-    setLeft([]);
-    setRight([]);
-    setMerged([]);
-    setHistory([]);
-    setComparisons(0);
+  const restart = useCallback(() => {
+    dispatch({ type: "RESET", members });
   }, [members]);
 
+  /* ---------- SAVE RANKING WHEN DONE ---------- */
   useEffect(() => {
-    initSorter();
-  }, [initSorter]);
-
-  /* ---------- LOAD NEXT MERGE ---------- */
-  useEffect(() => {
-    if (left.length || right.length || merged.length) return;
-
-    if (stack.length === 1) {
-      setRanking(stack[0]);
+    if (state.done && state.ranking) {
+      setRanking(state.ranking);
       navigate("/results");
-      return;
     }
-
-    if (stack.length >= 2) {
-      const [a, b, ...rest] = stack;
-      setLeft(a);
-      setRight(b);
-      setMerged([]);
-      setStack(rest);
-    }
-  }, [stack, left, right, merged, navigate, setRanking]);
-
-  /* ---------- HISTORY ---------- */
-  const saveHistory = () => {
-    setHistory((h) => [...h, { left, right, merged, stack, comparisons }]);
-  };
-
-  const pickLeft = () => {
-    saveHistory();
-    setMerged((m) => [...m, left[0]]);
-    setLeft((l) => l.slice(1));
-    setComparisons((c) => c + 1);
-  };
-
-  const pickRight = () => {
-    saveHistory();
-    setMerged((m) => [...m, right[0]]);
-    setRight((r) => r.slice(1));
-    setComparisons((c) => c + 1);
-  };
-
-  const pickTie = () => {
-    saveHistory();
-    setMerged((m) => [...m, left[0], right[0]]);
-    setLeft((l) => l.slice(1));
-    setRight((r) => r.slice(1));
-    setComparisons((c) => c + 1);
-  };
-
-  const undo = () => {
-    if (!history.length) return;
-    const prev = history[history.length - 1];
-    setLeft(prev.left);
-    setRight(prev.right);
-    setMerged(prev.merged);
-    setStack(prev.stack);
-    setComparisons(prev.comparisons);
-    setHistory((h) => h.slice(0, -1));
-  };
-
-  /* ---------- AUTO FINISH ---------- */
-  useEffect(() => {
-    if (!left.length && right.length) {
-      setMerged((m) => [...m, ...right]);
-      setRight([]);
-    }
-    if (!right.length && left.length) {
-      setMerged((m) => [...m, ...left]);
-      setLeft([]);
-    }
-    if (!left.length && !right.length && merged.length) {
-      setStack((s) => [...s, merged]);
-      setMerged([]);
-    }
-  }, [left, right, merged]);
+  }, [state.done, state.ranking, setRanking, navigate]);
 
   /* ---------- STATES ---------- */
   if (members.length < 2) {
@@ -132,7 +47,7 @@ export default function Sorter() {
     );
   }
 
-  if (!left.length || !right.length) {
+  if (!state.left.length || !state.right.length) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         {t("preparing")}
@@ -140,13 +55,12 @@ export default function Sorter() {
     );
   }
 
-  // ✅ SAFE PROGRESS CALCULATION (FIX)
   const estimated = Math.ceil(members.length * Math.log2(members.length));
-  const safeComparisons = Math.min(comparisons, estimated);
+  const safeComparisons = Math.min(state.comparisons, estimated);
   const progress = Math.round((safeComparisons / estimated) * 100);
 
-  const L = left[0];
-  const R = right[0];
+  const L = state.left[0];
+  const R = state.right[0];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-200 px-4 py-8 relative overflow-hidden">
@@ -182,12 +96,16 @@ export default function Sorter() {
             {t("back")}
           </Button>
 
-          <Button variant="outline" onClick={undo} disabled={!history.length}>
+          <Button
+            variant="outline"
+            onClick={() => dispatch({ type: "UNDO" })}
+            disabled={!state.history.length}
+          >
             <Undo2 className="mr-2 h-4 w-4" />
             {t("undo")}
           </Button>
 
-          <Button variant="outline" onClick={initSorter}>
+          <Button variant="outline" onClick={restart}>
             <RotateCcw className="mr-2 h-4 w-4" />
             {t("restart")}
           </Button>
@@ -198,7 +116,7 @@ export default function Sorter() {
 
           {/* LEFT */}
           <Card
-            onClick={pickLeft}
+            onClick={() => dispatch({ type: "PICK_LEFT" })}
             className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200 relative group"
           >
             <button
@@ -210,11 +128,11 @@ export default function Sorter() {
             >
               <Info className="w-5 h-5" />
             </button>
-            <img 
-              src={L.imageUrl} 
-              alt={L.name} 
+            <img
+              src={L.imageUrl}
+              alt={L.name}
               onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" 
+              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover"
             />
             <div className="p-4 text-center">
               <h3 className="font-bold text-lg text-emerald-700">{L.name}</h3>
@@ -229,7 +147,7 @@ export default function Sorter() {
             <div className="text-4xl font-black text-emerald-600 drop-shadow">VS</div>
 
             <Button
-              onClick={pickTie}
+              onClick={() => dispatch({ type: "PICK_TIE" })}
               className="px-8 py-4 text-lg font-black rounded-full text-white shadow-2xl border-2 border-white hover:scale-110 transition"
             >
               {t("equal")}
@@ -238,7 +156,7 @@ export default function Sorter() {
 
           {/* RIGHT */}
           <Card
-            onClick={pickRight}
+            onClick={() => dispatch({ type: "PICK_RIGHT" })}
             className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200 relative group"
           >
             <button
@@ -250,11 +168,11 @@ export default function Sorter() {
             >
               <Info className="w-5 h-5" />
             </button>
-            <img 
-              src={R.imageUrl} 
-              alt={R.name} 
+            <img
+              src={R.imageUrl}
+              alt={R.name}
               onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
-              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover" 
+              className="w-full h-[220px] sm:h-[300px] lg:h-[480px] object-cover"
             />
             <div className="p-4 text-center">
               <h3 className="font-bold text-lg text-emerald-700">{R.name}</h3>
@@ -272,10 +190,10 @@ export default function Sorter() {
       </footer>
 
       {/* Profile Modal */}
-      <ProfileModal 
-        member={selectedProfile} 
-        isOpen={!!selectedProfile} 
-        onClose={() => setSelectedProfile(null)} 
+      <ProfileModal
+        member={selectedProfile}
+        isOpen={!!selectedProfile}
+        onClose={() => setSelectedProfile(null)}
       />
     </div>
   );
