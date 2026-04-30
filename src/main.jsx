@@ -10,6 +10,13 @@ import "./i18n";
 // Initialize global error handlers
 initializeErrorHandlers();
 
+// Hand off from the static boot loader to the React Preloader.
+const bootLoader = document.getElementById("boot-loader");
+if (bootLoader) {
+  bootLoader.style.opacity = "0";
+  setTimeout(() => bootLoader.remove(), 300);
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
