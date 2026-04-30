@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
 import { Globe, Star, Sparkles, Users } from "lucide-react";
@@ -34,6 +34,13 @@ export default function Home() {
   const [status, setStatus] = useState("all");
   const [generation, setGeneration] = useState("all");
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [error, setError] = useState("");
+
+  // Clear stale error when filters change
+  useEffect(() => {
+    if (error) setError("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, generation]);
 
   const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
 
@@ -54,7 +61,7 @@ export default function Home() {
 
   const handleStart = () => {
     if (filteredMembers.length < 2) {
-      alert(t("alertMin"));
+      setError(t("alertMin"));
       return;
     }
     setMembers(filteredMembers);
@@ -235,6 +242,17 @@ export default function Home() {
               >
                  {t("start")}
               </Button>
+
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  role="alert"
+                  className="text-center text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl py-2 px-3"
+                >
+                  {error}
+                </motion.p>
+              )}
 
             </CardContent>
           </Card>
