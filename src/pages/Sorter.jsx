@@ -39,6 +39,65 @@ export default function Sorter() {
 
   const equalRef = useMagnetic({ strength: 0.25 });
   const stageRef = useRef(null);
+  const [showHotkeys, setShowHotkeys] = useState(false);
+
+  /* ---------- KEYBOARD SHORTCUTS ----------
+     ← / A           pick left
+     → / D           pick right
+     Space / =       tie
+     Z / Backspace   undo
+     R               restart
+     ?               toggle hotkey overlay                                  */
+  useEffect(() => {
+    const onKey = (e) => {
+      // Don't intercept while user is typing in an input/select.
+      const target = e.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable) return;
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+        case "a":
+        case "A":
+          e.preventDefault();
+          dispatch({ type: "PICK_LEFT" });
+          break;
+        case "ArrowRight":
+        case "d":
+        case "D":
+          e.preventDefault();
+          dispatch({ type: "PICK_RIGHT" });
+          break;
+        case " ":
+        case "=":
+          e.preventDefault();
+          dispatch({ type: "PICK_TIE" });
+          break;
+        case "z":
+        case "Z":
+        case "Backspace":
+          e.preventDefault();
+          dispatch({ type: "UNDO" });
+          break;
+        case "r":
+        case "R":
+          e.preventDefault();
+          dispatch({ type: "RESET", members });
+          break;
+        case "?":
+          setShowHotkeys((v) => !v);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [members]);
 
   useEffect(() => {
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -215,17 +274,91 @@ export default function Sorter() {
             />
           </div>
         </div>
+
+        {/* Keyboard hint chip — only shown on devices with a fine pointer */}
+        <div className="hidden md:flex justify-center mt-8">
+          <button
+            onClick={() => setShowHotkeys((v) => !v)}
+            className="sticker bg-white/80 px-4 py-2 rounded-full text-xs font-kawaii font-bold text-ink/70 inline-flex items-center gap-2 hover:bg-white transition"
+          >
+            <Kbd>←</Kbd> <Kbd>→</Kbd> <Kbd>space</Kbd>
+            <span className="font-script text-base">press ? for shortcuts</span>
+          </button>
+        </div>
       </div>
 
       <footer className="relative z-10 mt-12 pb-6 text-center font-script text-base text-ink/60">
         © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
 
+      {showHotkeys && (
+        <HotkeyOverlay onClose={() => setShowHotkeys(false)} />
+      )}
+
       <ProfileModal
         member={selectedProfile}
         isOpen={!!selectedProfile}
         onClose={() => setSelectedProfile(null)}
       />
+    </div>
+  );
+}
+
+function Kbd({ children }) {
+  return (
+    <kbd className="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 bg-cream border-2 border-ink rounded-md text-[10px] font-kawaii font-bold text-ink shadow-[1px_1px_0_#064e3b]">
+      {children}
+    </kbd>
+  );
+}
+
+function HotkeyOverlay({ onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const rows = [
+    { keys: ["←", "A"], label: "Pick left" },
+    { keys: ["→", "D"], label: "Pick right" },
+    { keys: ["Space", "="], label: "Tie / Equal" },
+    { keys: ["Z", "⌫"], label: "Undo" },
+    { keys: ["R"], label: "Restart" },
+    { keys: ["?"], label: "Toggle this overlay" },
+    { keys: ["Esc"], label: "Close overlay" },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="sticker bg-white rounded-3xl p-6 max-w-sm w-full"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-kawaii font-bold text-xl text-ink mb-1">Shortcuts</h3>
+        <p className="font-script text-base text-ink/60 mb-4">go fast ♡</p>
+        <ul className="space-y-2.5">
+          {rows.map((r) => (
+            <li key={r.label} className="flex items-center justify-between gap-3">
+              <span className="font-kawaii font-bold text-sm text-ink/80">{r.label}</span>
+              <span className="flex gap-1.5">
+                {r.keys.map((k, i) => (
+                  <Kbd key={i}>{k}</Kbd>
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <button
+          onClick={onClose}
+          className="btn-pop bg-cream w-full mt-5 py-2 rounded-full font-kawaii font-bold text-ink text-sm"
+        >
+          Got it
+        </button>
+      </div>
     </div>
   );
 }
