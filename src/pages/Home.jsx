@@ -1,17 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
-import { Globe, Star, Sparkles, Users } from "lucide-react";
+import { Globe, Star, Users, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -26,6 +18,8 @@ import { useRankStore } from "../store/useRankStore";
 import { shuffle } from "../lib/shuffle";
 import ProfileModal from "../components/ProfileModal";
 
+const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
+
 export default function Home() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -36,28 +30,23 @@ export default function Home() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [error, setError] = useState("");
 
-  // Clear stale error when filters change
   useEffect(() => {
     if (error) setError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, generation]);
 
-  const IMAGE_FALLBACK = "https://placehold.co/400x400?text=KLP48";
-
-  // Filter members
   const filteredMembers = useMemo(() => {
     return members.filter((m) => {
       if (status !== "all" && m.status !== status) return false;
-      if (generation !== "all" && m.generation !== Number(generation))
-        return false;
+      if (generation !== "all" && m.generation !== Number(generation)) return false;
       return true;
     });
   }, [status, generation]);
 
-  // Random avatars
-  const randomMembers = useMemo(() => {
-    return shuffle(members.filter((m) => m.status === "active")).slice(0, 6);
-  }, []);
+  const randomMembers = useMemo(
+    () => shuffle(members.filter((m) => m.status === "active")).slice(0, 6),
+    []
+  );
 
   const handleStart = () => {
     if (filteredMembers.length < 2) {
@@ -73,44 +62,72 @@ export default function Home() {
     localStorage.setItem("language", lng);
   };
 
+  // Hand-placed decorations — keep sparse so the page doesn't get messy.
+  const sparkles = [
+    { top: "12%", left: "5%",  size: 24, rotate: -10, delay: 0 },
+    { top: "8%",  right: "12%", size: 32, rotate: 15,  delay: 0.6 },
+    { top: "55%", left: "3%",  size: 20, rotate: 25,  delay: 1.2 },
+    { top: "70%", right: "6%",  size: 28, rotate: -20, delay: 0.3 },
+    { top: "88%", left: "45%", size: 22, rotate: 8,   delay: 1.5 },
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-100 text-gray-900 relative overflow-hidden aurora-emerald">
+    <main className="min-h-screen bg-kawaii text-ink relative overflow-hidden font-sans">
 
-      {/* Floating idol particles */}
-      <div className="idol-particles" aria-hidden="true">
-        <span /><span /><span /><span /><span /><span />
-        <span /><span /><span /><span /><span /><span />
-      </div>
+      {/* Soft pink + emerald gradient blobs (sit BELOW halftone) */}
+      <div className="absolute -top-32 -left-20 w-[28rem] h-[28rem] bg-sakura-200/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-40 -right-24 w-[24rem] h-[24rem] bg-emerald-300/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/3 w-[22rem] h-[22rem] bg-sakura-100 rounded-full blur-3xl pointer-events-none" />
 
-      {/* HEADER */}
-      <header className="fixed top-0 w-full bg-white/80 backdrop-blur border-b border-emerald-200 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center">
+      {/* Sparkle decorations */}
+      {sparkles.map((s, i) => (
+        <motion.div
+          key={i}
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: s.delay, type: "spring", stiffness: 200 }}
+          className="absolute text-sakura-500 pointer-events-none animate-twinkle"
+          style={{
+            top: s.top,
+            left: s.left,
+            right: s.right,
+            fontSize: s.size,
+            transform: `rotate(${s.rotate}deg)`,
+          }}
+        >
+          ✦
+        </motion.div>
+      ))}
 
-          {/* LEFT LOGO */}
-          <h1 className="font-black text-lg text-emerald-600 flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            KLP48 Sorter
-          </h1>
+      {/* HEADER — chunky sticker bar */}
+      <header className="sticky top-3 mx-3 sm:mx-6 z-50 mb-6">
+        <div className="sticker bg-white max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center rounded-full">
 
-          {/* CENTER EMPTY */}
+          {/* Logo */}
+          <Link to="/" className="font-kawaii font-bold text-base sm:text-lg text-ink flex items-center gap-2">
+            <span className="text-2xl">🍀</span>
+            <span className="hidden sm:inline">KLP48 Sorter</span>
+          </Link>
+
+          {/* Members nav as chunky tag */}
           <div className="flex justify-center">
-            <Link 
-              to="/members" 
-              className="flex items-center gap-1.5 text-sm font-bold text-emerald-700 hover:text-emerald-500 transition px-4 py-2 bg-emerald-50/50 rounded-full"
+            <Link
+              to="/members"
+              className="btn-pop bg-sakura-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-4 py-2 rounded-full"
             >
               <Users className="w-4 h-4" />
-              Members
+              <span className="hidden sm:inline">Members</span>
             </Link>
           </div>
 
-          {/* RIGHT LANGUAGE */}
+          {/* Language */}
           <div className="flex justify-end">
             <Select value={i18n.language} onValueChange={changeLanguage}>
-              <SelectTrigger className="h-9 px-3 rounded-full border border-emerald-200 shadow-sm bg-white flex items-center gap-2 text-sm font-bold text-emerald-700">
+              <SelectTrigger className="h-9 px-3 rounded-full border-2 border-ink bg-white flex items-center gap-2 text-sm font-kawaii font-bold text-ink shadow-[2px_2px_0_#064e3b]">
                 <Globe className="w-4 h-4 text-emerald-600" />
                 <SelectValue />
               </SelectTrigger>
-
               <SelectContent align="end" className="min-w-[120px]">
                 <SelectItem value="en">🇺🇸 EN</SelectItem>
                 <SelectItem value="ja">🇯🇵 JP</SelectItem>
@@ -119,99 +136,137 @@ export default function Home() {
               </SelectContent>
             </Select>
           </div>
-
         </div>
       </header>
 
       {/* MAIN */}
-      <div className="pt-24 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 relative z-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 sm:px-6 relative z-10 pt-4 pb-20">
 
         {/* LEFT HERO */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="lg:col-span-7 space-y-6"
+          className="lg:col-span-7 space-y-8"
         >
-          <div className="relative space-y-3">
-            <div className="absolute -inset-2 bg-emerald-400/30 blur-3xl rounded-full"></div>
+          {/* Greeting note in handwritten script */}
+          <motion.div
+            initial={{ opacity: 0, x: -20, rotate: -3 }}
+            animate={{ opacity: 1, x: 0, rotate: -3 }}
+            transition={{ delay: 0.4 }}
+            className="inline-block font-script text-xl sm:text-2xl text-sakura-600"
+          >
+            hi, oshi-hunter ♡
+          </motion.div>
 
-            <h1 className="relative text-4xl sm:text-6xl xl:text-7xl font-black font-display tracking-tight idol-text-shine drop-shadow-lg">
-              {t("title")}
+          {/* TITLE */}
+          <div className="space-y-2">
+            <h1 className="font-kawaii font-bold leading-[0.95] text-5xl sm:text-7xl xl:text-8xl tracking-tight">
+              <span className="inline-block squiggle-underline text-emerald-600 drop-shadow-[4px_4px_0_#be185d]">
+                {t("title")}
+              </span>
             </h1>
-
-            <span className="inline-block px-4 py-1 bg-white/80 border border-emerald-200 rounded-full text-sm font-semibold text-emerald-600 shadow">
-              🌟 {t("subtitle")}
-            </span>
-
-            <p className="text-lg text-green-700 max-w-xl">
-              {t("description")}
-            </p>
           </div>
 
-          <div className="flex items-center -space-x-6 mt-4">
+          {/* Subtitle as rotated sticker badge */}
+          <motion.span
+            whileHover={{ rotate: 0, scale: 1.05 }}
+            className="inline-block sticker-pink px-4 py-2 text-sm font-kawaii font-bold text-sakura-700 transform -rotate-2"
+          >
+            🌸 {t("subtitle")}
+          </motion.span>
+
+          <p className="text-lg text-ink/80 max-w-xl leading-relaxed">
+            {t("description")}
+          </p>
+
+          {/* Polaroid avatars */}
+          <div className="flex items-end flex-wrap gap-3 sm:gap-4 pt-4">
             {randomMembers.map((m, i) => (
-              <motion.img
+              <motion.button
                 key={m.id}
-                src={m.imageUrl}
-                alt={m.name}
-                title={m.fullName}
                 onClick={() => setSelectedProfile(m)}
-                onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
-                initial={{ rotate: i % 2 === 0 ? -5 : 5 }}
-                whileHover={{ scale: 1.1, rotate: 0, zIndex: 10, cursor: 'pointer' }}
-                className="w-20 h-20 sm:w-24 sm:h-24 xl:w-28 xl:h-28 rounded-full border-4 border-white shadow-2xl ring-4 ring-emerald-300 ring-offset-2 bg-white relative"
-              />
+                title={m.fullName}
+                initial={{ opacity: 0, y: 30, rotate: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.08, type: "spring", stiffness: 180 }}
+                className="polaroid w-20 sm:w-24 xl:w-28 cursor-pointer focus:outline-none"
+                style={{ "--tilt": `${(i % 2 === 0 ? -1 : 1) * (3 + (i % 3) * 2)}deg` }}
+              >
+                <img
+                  src={m.imageUrl}
+                  alt={m.name}
+                  onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
+                  className="w-full aspect-square object-cover bg-cream"
+                />
+                <div className="absolute bottom-1 left-0 right-0 text-center font-script text-sm text-ink truncate px-2">
+                  {m.name}
+                </div>
+              </motion.button>
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mt-6">
-            <Button
+          {/* CTA row */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center pt-4">
+            <button
               onClick={handleStart}
-              className="w-full sm:w-auto px-8 py-6 text-lg font-black bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 rounded-full shadow-xl hover:scale-110 transition idol-glow-pulse"
+              className="btn-pop bg-gradient-to-r from-emerald-300 to-emerald-500 px-8 py-4 text-lg font-kawaii font-bold rounded-full text-white"
             >
               💚 {t("startRanking")}
-            </Button>
+            </button>
 
-            <span className="flex items-center gap-2 px-4 py-2 bg-white/90 rounded-full border border-emerald-200 shadow-sm font-semibold text-emerald-600 text-sm">
-              <Star className="w-4 h-4" />
+            <span className="sticker bg-white inline-flex items-center gap-2 px-4 py-2 rounded-full font-kawaii font-bold text-emerald-700 text-sm transform rotate-1">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
               {t("membersReadyShort", { count: filteredMembers.length })}
             </span>
           </div>
 
-          {/* Stats */}
-          <div className="flex gap-6 mt-2 text-sm font-semibold text-emerald-700">
-            <span>🎤 {members.length} {t("members")}</span>
-            <span>✨ 2 {t("generation")}</span>
-            <span>💿 {t("active")}</span>
+          {/* Stats row as sticker chips */}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <span className="sticker-pink bg-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-sakura-700">
+              🎤 {members.length} {t("members")}
+            </span>
+            <span className="sticker bg-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-emerald-700">
+              ✨ 2 {t("generation")}
+            </span>
+            <span className="sticker bg-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-emerald-700">
+              💿 {t("active")}
+            </span>
           </div>
         </motion.section>
 
-        {/* RIGHT FILTER */}
+        {/* RIGHT FILTER — sticker note with washi tape */}
         <motion.aside
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="lg:col-span-5 flex justify-center"
+          initial={{ opacity: 0, y: 30, rotate: 2 }}
+          animate={{ opacity: 1, y: 0, rotate: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="lg:col-span-5 flex justify-center pt-8 lg:pt-16"
         >
-          <Card className="w-full sm:max-w-md glass-card shadow-2xl rounded-3xl relative z-10">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl sm:text-2xl text-emerald-600">
-                {t("filterMembersTitle")}
-              </CardTitle>
-              <CardDescription>
-                {t("filterMembersDesc")}
-              </CardDescription>
-            </CardHeader>
+          <div className="relative w-full sm:max-w-md">
+            {/* Washi tape strips */}
+            <div className="washi-tape -top-3 left-8 transform -rotate-6" />
+            <div className="washi-tape -top-3 right-8 transform rotate-3" />
 
-            <CardContent className="space-y-6">
+            <div className="sticker bg-white rounded-3xl p-6 sm:p-7 space-y-5">
+
+              {/* Header */}
+              <div className="text-center space-y-1">
+                <h2 className="font-kawaii font-bold text-xl sm:text-2xl text-ink flex items-center justify-center gap-2">
+                  <Heart className="w-5 h-5 fill-sakura-500 text-sakura-500" />
+                  {t("filterMembersTitle")}
+                </h2>
+                <p className="font-script text-base text-ink/60">
+                  {t("filterMembersDesc")}
+                </p>
+              </div>
 
               {/* STATUS */}
               <div className="space-y-2">
-                <Label className="font-semibold text-emerald-700">{t("status")}</Label>
+                <Label className="font-kawaii font-bold text-ink text-sm">
+                  {t("status")}
+                </Label>
                 <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger className="h-12 rounded-full border-emerald-200">
+                  <SelectTrigger className="h-12 rounded-full border-2 border-ink bg-cream font-kawaii font-bold text-ink shadow-[3px_3px_0_#064e3b]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -224,9 +279,11 @@ export default function Home() {
 
               {/* GENERATION */}
               <div className="space-y-2">
-                <Label className="font-semibold text-emerald-700">{t("generation")}</Label>
+                <Label className="font-kawaii font-bold text-ink text-sm">
+                  {t("generation")}
+                </Label>
                 <Select value={generation} onValueChange={setGeneration}>
-                  <SelectTrigger className="h-12 rounded-full border-emerald-200">
+                  <SelectTrigger className="h-12 rounded-full border-2 border-ink bg-cream font-kawaii font-bold text-ink shadow-[3px_3px_0_#064e3b]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -237,42 +294,40 @@ export default function Home() {
                 </Select>
               </div>
 
-              {/* START BUTTON */}
-              <Button
+              {/* START BUTTON — pink pop */}
+              <button
                 onClick={handleStart}
-                className="w-full h-14 text-lg font-black bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 hover:scale-110 transition shadow-xl rounded-full"
+                className="btn-pop-pink w-full h-14 rounded-full bg-gradient-to-r from-sakura-300 to-sakura-500 text-white font-kawaii font-bold text-lg"
               >
-                 {t("start")}
-              </Button>
+                {t("start")} →
+              </button>
 
               {error && (
                 <motion.p
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   role="alert"
-                  className="text-center text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl py-2 px-3"
+                  className="text-center text-sm font-kawaii font-bold text-sakura-700 bg-sakura-50 border-2 border-sakura-300 rounded-2xl py-2 px-3"
                 >
                   {error}
                 </motion.p>
               )}
-
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.aside>
       </div>
 
       {/* FOOTER */}
-      <footer className="mt-20 py-6 text-center text-sm text-green-700">
-        © 2026 <span className="font-semibold text-emerald-600">Malvin Evano</span> • Fan-made project
+      <footer className="relative z-10 pb-8 text-center font-script text-base text-ink/60">
+        © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
 
       {/* Profile Modal */}
-      <ProfileModal 
-        member={selectedProfile} 
-        isOpen={!!selectedProfile} 
-        onClose={() => setSelectedProfile(null)} 
+      <ProfileModal
+        member={selectedProfile}
+        isOpen={!!selectedProfile}
+        onClose={() => setSelectedProfile(null)}
       />
-
     </main>
   );
 }
