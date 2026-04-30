@@ -1,11 +1,9 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowLeft, Users, Filter, Info } from "lucide-react";
+import { Search, ArrowLeft, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -18,6 +16,8 @@ import {
 import { members } from "../data/members";
 import ProfileModal from "../components/ProfileModal";
 
+const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
+
 export default function Members() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -27,148 +27,150 @@ export default function Members() {
   const [generation, setGeneration] = useState("all");
   const [selectedProfile, setSelectedProfile] = useState(null);
 
-  const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
-
-  // Filter Logic
   const filtered = useMemo(() => {
     return members.filter((m) => {
-      const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase()) || 
-                            m.fullName.toLowerCase().includes(search.toLowerCase());
+      const q = search.toLowerCase();
+      const matchesSearch =
+        m.name.toLowerCase().includes(q) ||
+        m.fullName.toLowerCase().includes(q);
       const matchesStatus = status === "all" || m.status === status;
       const matchesGen = generation === "all" || m.generation === Number(generation);
-      
       return matchesSearch && matchesStatus && matchesGen;
     });
   }, [search, status, generation]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 pb-20">
-      
-      {/* HEADER */}
-      <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur border-b border-emerald-100">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate("/")} className="text-emerald-700 font-bold">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t("back")}
-          </Button>
-          <h1 className="text-xl font-black text-emerald-600 flex items-center gap-2">
+    <div className="min-h-screen bg-kawaii text-ink relative overflow-hidden font-sans pb-12">
+
+      <div className="absolute -top-32 -left-20 w-[28rem] h-[28rem] bg-sakura-200/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-40 -right-24 w-[24rem] h-[24rem] bg-emerald-300/40 rounded-full blur-3xl pointer-events-none" />
+
+      <div aria-hidden="true" className="absolute top-20 left-[6%] text-2xl text-sakura-500 animate-twinkle">✦</div>
+      <div aria-hidden="true" className="absolute top-1/3 right-[8%] text-3xl text-emerald-500 animate-twinkle" style={{ animationDelay: "1s" }}>✦</div>
+      <div aria-hidden="true" className="absolute bottom-1/4 left-[15%] text-xl text-sakura-400 animate-twinkle" style={{ animationDelay: "0.5s" }}>✦</div>
+
+      {/* HEADER — sticker pill */}
+      <header className="sticky top-3 mx-3 sm:mx-6 z-40 mb-6">
+        <div className="sticker bg-white max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center rounded-full">
+          <button
+            onClick={() => navigate("/")}
+            className="btn-pop bg-cream px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-ink flex items-center gap-1.5 w-fit"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">{t("back")}</span>
+          </button>
+
+          <h1 className="font-kawaii font-bold text-base sm:text-xl text-emerald-700 flex items-center justify-center gap-2">
             <Users className="w-5 h-5" />
-            {t("membersPage.title")}
+            <span>{t("membersPage.title")}</span>
           </h1>
-          <div className="w-20"></div> {/* Spacer */}
+
+          <div className="flex justify-end">
+            <span className="sticker-pink bg-white px-3 py-1 rounded-full text-xs sm:text-sm font-kawaii font-bold text-sakura-700">
+              {filtered.length}
+            </span>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 pt-8">
-        
-        {/* CONTROLS */}
-        <section className="bg-white/70 backdrop-blur p-6 rounded-3xl shadow-xl border border-emerald-100 mb-10 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input 
-                placeholder={t("membersPage.searchPlaceholder")} 
-                className="pl-10 rounded-full border-emerald-100 focus:ring-emerald-500"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+
+        {/* CONTROLS — sticker note */}
+        <section className="relative mb-10">
+          <div className="washi-tape -top-3 left-12 transform -rotate-6" />
+          <div className="washi-tape -top-3 right-12 transform rotate-3" />
+
+          <div className="sticker bg-white p-5 sm:p-6 rounded-3xl space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/50 z-10" />
+                <Input
+                  placeholder={t("membersPage.searchPlaceholder")}
+                  className="pl-10 h-11 rounded-full border-2 border-ink bg-cream font-kawaii font-bold text-ink shadow-[3px_3px_0_#064e3b] focus-visible:ring-0"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="h-11 rounded-full border-2 border-ink bg-cream font-kawaii font-bold text-ink shadow-[3px_3px_0_#064e3b]">
+                  <SelectValue placeholder={t("status")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("membersPage.allStatus")}</SelectItem>
+                  <SelectItem value="active">{t("active")}</SelectItem>
+                  <SelectItem value="graduated">{t("graduated")}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={generation} onValueChange={setGeneration}>
+                <SelectTrigger className="h-11 rounded-full border-2 border-ink bg-cream font-kawaii font-bold text-ink shadow-[3px_3px_0_#064e3b]">
+                  <SelectValue placeholder={t("generation")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("membersPage.allGen")}</SelectItem>
+                  <SelectItem value="1">{t("gen1")}</SelectItem>
+                  <SelectItem value="2">{t("gen2")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Filter Status */}
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="rounded-full border-emerald-100">
-                <SelectValue placeholder={t("status")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("membersPage.allStatus")}</SelectItem>
-                <SelectItem value="active">{t("active")}</SelectItem>
-                <SelectItem value="graduated">{t("graduated")}</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Filter Gen */}
-            <Select value={generation} onValueChange={setGeneration}>
-              <SelectTrigger className="rounded-full border-emerald-100">
-                <SelectValue placeholder={t("generation")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("membersPage.allGen")}</SelectItem>
-                <SelectItem value="1">{t("gen1")}</SelectItem>
-                <SelectItem value="2">{t("gen2")}</SelectItem>
-              </SelectContent>
-            </Select>
-
+            <p className="font-script text-base text-sakura-600 px-2">
+              {t("membersPage.showingCount", { count: filtered.length })}
+            </p>
           </div>
-          
-          <p className="text-xs text-emerald-600 font-bold px-2">
-            {t("membersPage.showingCount", { count: filtered.length })}
-          </p>
         </section>
 
-        {/* GRID */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        {/* GRID — polaroid cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-7">
           {filtered.map((m, i) => (
-            <motion.div
+            <motion.button
               key={m.id}
+              onClick={() => setSelectedProfile(m)}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: Math.min(i * 0.03, 0.6) }}
+              className="polaroid w-full focus:outline-none text-left"
+              style={{ "--tilt": `${(i % 2 === 0 ? -1 : 1) * (1 + (i % 3))}deg` }}
             >
-              <Card 
-                onClick={() => setSelectedProfile(m)}
-                className="group relative cursor-pointer overflow-hidden rounded-2xl border-emerald-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-white"
-              >
-                {/* Image */}
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img 
-                    src={m.imageUrl} 
-                    alt={m.name} 
-                    onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
-                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                  />
+              <div className="aspect-[3/4] overflow-hidden bg-cream">
+                <img
+                  src={m.imageUrl}
+                  alt={m.name}
+                  onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute bottom-1 left-0 right-0 text-center px-2">
+                <div className="font-kawaii font-bold text-sm text-ink truncate">
+                  {m.name}
                 </div>
-
-                {/* Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-                
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                   <h3 className="font-bold text-sm sm:text-base leading-tight">{m.name}</h3>
-                   <p className="text-[10px] opacity-80 uppercase tracking-widest font-bold">
-                     {t("membersPage.generation", { gen: m.generation })}
-                   </p>
+                <div className="font-script text-xs text-ink/60 truncate">
+                  Gen {m.generation}{m.status === "graduated" && " · 卒"}
                 </div>
-
-                <div className="absolute top-2 right-2 p-1.5 bg-white/20 backdrop-blur rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Info className="w-4 h-4 text-white" />
-                </div>
-              </Card>
-            </motion.div>
+              </div>
+            </motion.button>
           ))}
         </div>
 
         {/* Empty State */}
         {filtered.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-400 font-medium">{t("membersPage.noResults")}</p>
+            <div className="font-script text-3xl text-sakura-500 mb-2">¯\_(ツ)_/¯</div>
+            <p className="font-kawaii font-bold text-ink/60">{t("membersPage.noResults")}</p>
           </div>
         )}
-
       </main>
 
-      {/* FOOTER */}
-      <footer className="mt-20 py-6 text-center text-sm text-green-700">
-        © 2026 <span className="font-semibold text-emerald-600">Malvin Evano</span> • Fan-made project
+      <footer className="relative z-10 mt-16 pb-6 text-center font-script text-base text-ink/60">
+        © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
 
-      {/* Profile Modal */}
-      <ProfileModal 
-        member={selectedProfile} 
-        isOpen={!!selectedProfile} 
-        onClose={() => setSelectedProfile(null)} 
+      <ProfileModal
+        member={selectedProfile}
+        isOpen={!!selectedProfile}
+        onClose={() => setSelectedProfile(null)}
       />
-
     </div>
   );
 }
