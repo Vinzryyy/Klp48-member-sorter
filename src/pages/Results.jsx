@@ -16,14 +16,27 @@ export default function Results() {
   const { ranking, setRanking } = useRankStore();
 
   /* ================= PERSISTENCE ================= */
+  // Load once on mount when store is empty (e.g. user navigated directly to /results).
+  useEffect(() => {
+    if (ranking.length === 0) {
+      const saved = localStorage.getItem("klp48-ranking");
+      if (saved) {
+        try {
+          setRanking(JSON.parse(saved));
+        } catch {
+          localStorage.removeItem("klp48-ranking");
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save whenever a non-empty ranking appears in the store.
   useEffect(() => {
     if (ranking.length > 0) {
       localStorage.setItem("klp48-ranking", JSON.stringify(ranking));
-    } else {
-      const saved = localStorage.getItem("klp48-ranking");
-      if (saved) setRanking(JSON.parse(saved));
     }
-  }, [ranking, setRanking]);
+  }, [ranking]);
 
   const [view, setView] = useState("ranking");
 
