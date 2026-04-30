@@ -1,7 +1,15 @@
 {
-  "name": "vite-project",
+  "name": "klp48-member-sorter",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Fan-made interactive sorter that ranks KLP48 members via a merge-sort tournament. Supports 4 languages and PNG export of Top 3, Full Ranking, and Tier List.",
+  "author": "Malvin Evano",
+  "license": "MIT",
+  "homepage": "https://klp48-member-sorter.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vinzryyy/Klp48-member-sorter.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
