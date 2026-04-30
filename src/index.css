@@ -6,11 +6,11 @@
 @layer base {
   :root {
     /* Background & text */
-    --background: 140 60% 98%; /* very light mint */
-    --foreground: 158 30% 15%; /* dark emerald text */
+    --background: 140 60% 98%;
+    --foreground: 158 30% 15%;
 
     /* Primary idol green */
-    --primary: 158 64% 52%; /* emerald-600 */
+    --primary: 158 64% 52%;
     --primary-foreground: 0 0% 100%;
 
     /* Accent mint */
@@ -29,6 +29,14 @@
 
     --muted: 150 40% 95%;
     --muted-foreground: 158 20% 40%;
+
+    /* Idol palette */
+    --idol-emerald: 16 185 129;
+    --idol-mint:    167 243 208;
+    --idol-deep:    6 95 70;
+    --idol-gold:    250 204 21;
+    --idol-silver:  203 213 225;
+    --idol-bronze:  217 119 6;
   }
 
   /* 🌙 Dark Mode Idol Green */
@@ -53,33 +61,209 @@
     --muted-foreground: 140 40% 70%;
   }
 
-  /* Tailwind global */
   * {
     @apply border-border;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: "Nunito", ui-sans-serif, system-ui;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "ss01", "cv01";
+  }
+
+  /* Idol-themed selection */
+  ::selection {
+    background: rgba(16, 185, 129, 0.35);
+    color: #064e3b;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(167, 243, 208, 0.2);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #34d399, #059669);
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #10b981, #047857);
+  }
+
+  /* Accessible focus ring */
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(255, 255, 255, 0.85),
+      0 0 0 6px rgba(16, 185, 129, 0.65),
+      0 0 24px rgba(16, 185, 129, 0.45);
+    border-radius: 12px;
   }
 }
 
-.idol-star {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #a7f3d0;
-  animation: floatStar 6s infinite ease-in-out;
+/* ============================================================
+   IDOL UTILITIES
+   ============================================================ */
+@layer utilities {
+
+  /* 🌌 Animated aurora mesh background.
+     Drop into any container with `relative overflow-hidden`. */
+  .aurora-emerald::before,
+  .aurora-emerald::after {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(60px);
+    opacity: 0.55;
+    animation: aurora 18s ease-in-out infinite;
+  }
+  .aurora-emerald::before {
+    background:
+      radial-gradient(circle at 20% 20%, #34d399 0%, transparent 45%),
+      radial-gradient(circle at 80% 30%, #6ee7b7 0%, transparent 50%),
+      radial-gradient(circle at 30% 80%, #10b981 0%, transparent 45%);
+  }
+  .aurora-emerald::after {
+    background:
+      radial-gradient(circle at 70% 70%, #a7f3d0 0%, transparent 50%),
+      radial-gradient(circle at 10% 60%, #5eead4 0%, transparent 45%);
+    animation-direction: reverse;
+    animation-duration: 22s;
+    opacity: 0.4;
+  }
+
+  /* ✨ Animated gradient text — for hero titles. */
+  .idol-text-shine {
+    background: linear-gradient(
+      90deg,
+      #047857 0%,
+      #10b981 25%,
+      #34d399 50%,
+      #10b981 75%,
+      #047857 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  /* 💫 Shimmer sweep — apply to a parent with overflow-hidden. */
+  .idol-shimmer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .idol-shimmer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: shimmer 3.4s ease-in-out infinite;
+    animation-delay: 1s;
+  }
+
+  /* 🟢 Glow-pulse ring — for the primary CTA. */
+  .idol-glow-pulse {
+    animation: glow-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* 🪟 Frosted glass preset. */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(167, 243, 208, 0.55);
+    box-shadow:
+      0 10px 40px -10px rgba(6, 95, 70, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* 💡 Skeleton shimmer for loading placeholders. */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(167, 243, 208, 0.25) 0%,
+      rgba(167, 243, 208, 0.55) 50%,
+      rgba(167, 243, 208, 0.25) 100%
+    );
+    background-size: 200% 100%;
+    animation: gradient-shift 1.6s linear infinite;
+  }
+
+  /* 🏆 Tier ring presets */
+  .ring-gold   { box-shadow: 0 0 0 4px #facc15, 0 0 24px rgba(250,204,21,0.6); }
+  .ring-silver { box-shadow: 0 0 0 4px #cbd5e1, 0 0 24px rgba(203,213,225,0.55); }
+  .ring-bronze { box-shadow: 0 0 0 4px #d97706, 0 0 24px rgba(217,119,6,0.5); }
 }
 
-.star1 { top: 20%; left: 10%; animation-delay: 0s; }
-.star2 { top: 40%; left: 80%; animation-delay: 1s; }
-.star3 { top: 70%; left: 20%; animation-delay: 2s; }
-.star4 { top: 60%; left: 60%; animation-delay: 3s; }
+/* ============================================================
+   FLOATING IDOL PARTICLES
+   ============================================================ */
+.idol-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
 
-@keyframes floatStar {
-  0%,100% { transform: translateY(0) scale(1); opacity: 0.6; }
-  50% { transform: translateY(-20px) scale(1.4); opacity: 1; }
+.idol-particles span {
+  position: absolute;
+  display: block;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #a7f3d0, 0 0 24px rgba(16, 185, 129, 0.6);
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+/* 12 hand-placed particles with varied size/speed/delay.
+   Hand-placed beats randomly-generated because we control density. */
+.idol-particles span:nth-child(1)  { top: 8%;  left: 12%; width: 6px;  height: 6px;  animation-delay: 0s;   animation-duration: 3.2s; }
+.idol-particles span:nth-child(2)  { top: 22%; left: 78%; width: 10px; height: 10px; animation-delay: 0.4s; animation-duration: 5s; }
+.idol-particles span:nth-child(3)  { top: 38%; left: 35%; width: 5px;  height: 5px;  animation-delay: 1.1s; animation-duration: 3.8s; }
+.idol-particles span:nth-child(4)  { top: 60%; left: 88%; width: 8px;  height: 8px;  animation-delay: 1.6s; animation-duration: 4.4s; }
+.idol-particles span:nth-child(5)  { top: 75%; left: 22%; width: 12px; height: 12px; animation-delay: 0.7s; animation-duration: 6s; }
+.idol-particles span:nth-child(6)  { top: 14%; left: 55%; width: 4px;  height: 4px;  animation-delay: 2.0s; animation-duration: 3s; }
+.idol-particles span:nth-child(7)  { top: 50%; left: 8%;  width: 7px;  height: 7px;  animation-delay: 2.5s; animation-duration: 4.2s; }
+.idol-particles span:nth-child(8)  { top: 88%; left: 68%; width: 6px;  height: 6px;  animation-delay: 0.2s; animation-duration: 5.4s; }
+.idol-particles span:nth-child(9)  { top: 30%; left: 92%; width: 9px;  height: 9px;  animation-delay: 1.4s; animation-duration: 4.8s; }
+.idol-particles span:nth-child(10) { top: 68%; left: 50%; width: 5px;  height: 5px;  animation-delay: 0.9s; animation-duration: 3.6s; }
+.idol-particles span:nth-child(11) { top: 5%;  left: 40%; width: 7px;  height: 7px;  animation-delay: 2.2s; animation-duration: 5.2s; }
+.idol-particles span:nth-child(12) { top: 82%; left: 45%; width: 8px;  height: 8px;  animation-delay: 1.8s; animation-duration: 4s; }
+
+/* ============================================================
+   REDUCED MOTION — respect user preference
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-emerald::before,
+  .aurora-emerald::after,
+  .idol-text-shine,
+  .idol-shimmer::before,
+  .idol-glow-pulse,
+  .skeleton-shimmer,
+  .idol-particles span {
+    animation: none !important;
+  }
 }

@@ -74,11 +74,13 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-100 text-gray-900 relative overflow-hidden">
+    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-100 text-gray-900 relative overflow-hidden aurora-emerald">
 
-      {/* Glow */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-300/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-300/30 rounded-full blur-3xl" />
+      {/* Floating idol particles */}
+      <div className="idol-particles" aria-hidden="true">
+        <span /><span /><span /><span /><span /><span />
+        <span /><span /><span /><span /><span /><span />
+      </div>
 
       {/* HEADER */}
       <header className="fixed top-0 w-full bg-white/80 backdrop-blur border-b border-emerald-200 z-50">
@@ -122,7 +124,7 @@ export default function Home() {
       </header>
 
       {/* MAIN */}
-      <div className="pt-24 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 px-4">
+      <div className="pt-24 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 relative z-10">
 
         {/* LEFT HERO */}
         <motion.section
@@ -134,7 +136,7 @@ export default function Home() {
           <div className="relative space-y-3">
             <div className="absolute -inset-2 bg-emerald-400/30 blur-3xl rounded-full"></div>
 
-            <h1 className="relative text-4xl sm:text-6xl xl:text-7xl font-black text-emerald-600 drop-shadow-lg">
+            <h1 className="relative text-4xl sm:text-6xl xl:text-7xl font-black font-display tracking-tight idol-text-shine drop-shadow-lg">
               {t("title")}
             </h1>
 
@@ -167,7 +169,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mt-6">
             <Button
               onClick={handleStart}
-              className="w-full sm:w-auto px-8 py-6 text-lg font-black bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 rounded-full shadow-xl hover:scale-110 transition animate-pulse"
+              className="w-full sm:w-auto px-8 py-6 text-lg font-black bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 rounded-full shadow-xl hover:scale-110 transition idol-glow-pulse"
             >
               💚 {t("startRanking")}
             </Button>
@@ -193,7 +195,7 @@ export default function Home() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="lg:col-span-5 flex justify-center"
         >
-          <Card className="w-full sm:max-w-md bg-white/70 backdrop-blur-xl border border-emerald-200 shadow-2xl rounded-3xl">
+          <Card className="w-full sm:max-w-md glass-card shadow-2xl rounded-3xl relative z-10">
             <CardHeader className="text-center">
               <CardTitle className="text-xl sm:text-2xl text-emerald-600">
                 {t("filterMembersTitle")}

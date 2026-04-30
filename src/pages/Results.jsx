@@ -162,11 +162,18 @@ export default function Results() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-3 py-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 px-3 py-6 relative overflow-hidden aurora-emerald">
+
+      {/* Floating idol particles */}
+      <div className="idol-particles" aria-hidden="true">
+        <span /><span /><span /><span /><span /><span />
+        <span /><span /><span /><span /><span /><span />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
 
         {/* ================= TITLE ================= */}
-        <h1 className="text-center text-2xl sm:text-4xl font-extrabold text-emerald-700 mb-1">
+        <h1 className="text-center text-2xl sm:text-4xl font-extrabold font-display tracking-tight idol-text-shine mb-1">
           KLP48 Member Sorter
         </h1>
         <p className="text-center text-gray-600 mb-6 text-sm sm:text-base">
@@ -213,12 +220,12 @@ export default function Results() {
                   {podium.map((m, i) => (
                     <Card
                       key={m.id}
-                      className={`relative text-center overflow-hidden shadow ${
+                      className={`relative text-center overflow-hidden idol-shimmer ${
                         i === 0
-                          ? "ring-2 sm:ring-4 ring-yellow-400"
+                          ? "ring-gold"
                           : i === 1
-                          ? "ring-2 sm:ring-4 ring-gray-400"
-                          : "ring-2 sm:ring-4 ring-orange-400"
+                          ? "ring-silver"
+                          : "ring-bronze"
                       }`}
                     >
                       <div className="absolute top-1 left-1 bg-black/70 text-white text-[10px] px-1 rounded">

@@ -63,17 +63,19 @@ export default function Sorter() {
   const R = state.right[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-200 px-4 py-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-200 px-4 py-8 relative overflow-hidden aurora-emerald">
 
-      {/* Glow bubbles */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-300/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-green-400/30 rounded-full blur-3xl" />
+      {/* Floating idol particles */}
+      <div className="idol-particles" aria-hidden="true">
+        <span /><span /><span /><span /><span /><span />
+        <span /><span /><span /><span /><span /><span />
+      </div>
 
-      <div className="max-w-6xl mx-auto relative">
+      <div className="max-w-6xl mx-auto relative z-10">
 
         {/* TITLE */}
         <div className="text-center mb-4">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-emerald-700 drop-shadow">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight idol-text-shine drop-shadow">
             {t("chooseOne")}
           </h1>
           <p className="text-sm text-gray-600">
@@ -117,7 +119,7 @@ export default function Sorter() {
           {/* LEFT */}
           <Card
             onClick={() => dispatch({ type: "PICK_LEFT" })}
-            className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200 relative group"
+            className="order-1 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden glass-card idol-shimmer relative group"
           >
             <button
               onClick={(e) => {
@@ -144,11 +146,11 @@ export default function Sorter() {
 
           {/* CENTER */}
           <div className="order-3 lg:order-2 col-span-2 lg:col-span-1 flex flex-col items-center justify-center gap-4">
-            <div className="text-4xl font-black text-emerald-600 drop-shadow">VS</div>
+            <div className="text-5xl font-black font-display idol-text-shine drop-shadow animate-float">VS</div>
 
             <Button
               onClick={() => dispatch({ type: "PICK_TIE" })}
-              className="px-8 py-4 text-lg font-black rounded-full text-white shadow-2xl border-2 border-white hover:scale-110 transition"
+              className="px-8 py-4 text-lg font-black rounded-full text-white shadow-2xl border-2 border-white hover:scale-110 transition bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 idol-glow-pulse"
             >
               {t("equal")}
             </Button>
@@ -157,7 +159,7 @@ export default function Sorter() {
           {/* RIGHT */}
           <Card
             onClick={() => dispatch({ type: "PICK_RIGHT" })}
-            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden bg-white/70 backdrop-blur border border-emerald-200 relative group"
+            className="order-2 lg:order-3 cursor-pointer hover:scale-105 transition shadow-2xl rounded-3xl overflow-hidden glass-card idol-shimmer relative group"
           >
             <button
               onClick={(e) => {
