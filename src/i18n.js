@@ -86,8 +86,25 @@ i18n.use(initReactI18next).init({
         restart: "Restart",
         chooseOne: "Which one do you prefer?",
         equal: "Equal",
+        tieHint: "can't decide? tap equal",
         progress: "Comparisons: {{comparisons}} ({{progress}}%)",
         generationLabel: "Generation {{gen}}",
+
+        /* PRELOADER */
+        preloader: {
+          welcome: "welcome ♡",
+          loading: "loading your oshi…",
+        },
+
+        /* ERROR BOUNDARY */
+        errorBoundary: {
+          title: "Oops! Something went wrong",
+          body: "We encountered an unexpected error. Don't worry, your data is safe!",
+          errorDetails: "Error Details (for debugging)",
+          reset: "Reset & Try Again",
+          goHome: "Go to Home",
+          persistHelp: "If this problem persists, please contact support.",
+        },
 
         /* RESULTS */
         noRanking: "No ranking data",
@@ -197,8 +214,25 @@ i18n.use(initReactI18next).init({
         restart: "重新开始",
         chooseOne: "你更喜欢哪一个？",
         equal: "一样",
+        tieHint: "拿不定主意？点「一样」",
         progress: "比较：{{comparisons}}（{{progress}}%）",
         generationLabel: "第 {{gen}} 期",
+
+        /* PRELOADER */
+        preloader: {
+          welcome: "欢迎 ♡",
+          loading: "正在加载你的推…",
+        },
+
+        /* ERROR BOUNDARY */
+        errorBoundary: {
+          title: "哎呀！出错了",
+          body: "我们遇到了未预期的错误。别担心，你的数据是安全的！",
+          errorDetails: "错误详情（调试用）",
+          reset: "重置并重试",
+          goHome: "返回首页",
+          persistHelp: "如果问题持续，请联系支持。",
+        },
 
         noRanking: "没有排序结果",
         home: "首页",
@@ -306,8 +340,25 @@ i18n.use(initReactI18next).init({
         restart: "Mula Semula",
         chooseOne: "Yang mana satu?",
         equal: "Sama",
+        tieHint: "tak boleh pilih? tekan sama",
         progress: "Perbandingan: {{comparisons}} ({{progress}}%)",
         generationLabel: "Generasi {{gen}}",
+
+        /* PRELOADER */
+        preloader: {
+          welcome: "selamat datang ♡",
+          loading: "memuat oshi anda…",
+        },
+
+        /* ERROR BOUNDARY */
+        errorBoundary: {
+          title: "Alamak! Ada masalah",
+          body: "Kami menemui ralat yang tidak dijangka. Jangan risau, data anda selamat!",
+          errorDetails: "Butiran Ralat (untuk debugging)",
+          reset: "Tetap Semula & Cuba Lagi",
+          goHome: "Ke Laman Utama",
+          persistHelp: "Jika masalah berterusan, sila hubungi sokongan.",
+        },
 
         noRanking: "Tiada ranking",
         home: "Laman Utama",
@@ -415,8 +466,25 @@ i18n.use(initReactI18next).init({
         restart: "やり直す",
         chooseOne: "どちらが好き？",
         equal: "同じ",
+        tieHint: "迷ったら「同じ」をタップ",
         progress: "比較：{{comparisons}}（{{progress}}%）",
         generationLabel: "{{gen}}期生",
+
+        /* PRELOADER */
+        preloader: {
+          welcome: "ようこそ ♡",
+          loading: "推しを読み込み中…",
+        },
+
+        /* ERROR BOUNDARY */
+        errorBoundary: {
+          title: "あれ？問題が発生しました",
+          body: "予期しないエラーが発生しました。データは安全です！",
+          errorDetails: "エラー詳細（デバッグ用）",
+          reset: "リセットしてやり直す",
+          goHome: "ホームに戻る",
+          persistHelp: "問題が続く場合はサポートまでご連絡ください。",
+        },
 
         noRanking: "ランキングなし",
         home: "ホーム",
