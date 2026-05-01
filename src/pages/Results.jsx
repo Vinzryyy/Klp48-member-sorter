@@ -28,7 +28,12 @@ export default function Results() {
       const saved = localStorage.getItem("klp48-ranking");
       if (saved) {
         try {
-          setRanking(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setRanking(parsed);
+          } else {
+            localStorage.removeItem("klp48-ranking");
+          }
         } catch {
           localStorage.removeItem("klp48-ranking");
         }
