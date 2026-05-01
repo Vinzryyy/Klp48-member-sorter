@@ -28,15 +28,14 @@ export const ErrorCodes = {
  * Should be called once at app startup
  */
 export const initializeErrorHandlers = () => {
-  // Handle uncaught errors
+  // Handle uncaught errors. Do NOT call preventDefault — that suppresses the
+  // browser's native console logging and Vite's HMR error overlay, which
+  // makes real bugs invisible during development.
   window.addEventListener("error", (event) => {
-    event.preventDefault();
     handleError(event.error || new Error(event.message), "Uncaught Error");
   });
 
-  // Handle unhandled promise rejections
   window.addEventListener("unhandledrejection", (event) => {
-    event.preventDefault();
     handleError(
       event.reason || new Error("Unknown promise rejection"),
       "Unhandled Rejection"
