@@ -159,7 +159,9 @@ export default function Sorter() {
     });
   }, [state.left, state.right, state.stack]);
 
-  // Animate card swap when the pair changes
+  // Animate card swap when the pair changes — scale-only "pop". We used
+  // to fade opacity too, but combined with the inner image's own load
+  // gate it could briefly show a partially-decoded photo on slow mobile.
   const pairKey = `${state.left[0]?.id ?? ""}-${state.right[0]?.id ?? ""}`;
   useEffect(() => {
     if (!stageRef.current) return;
@@ -167,8 +169,8 @@ export default function Sorter() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         [".sorter-left", ".sorter-right"],
-        { scale: 0.92, opacity: 0.5 },
-        { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.6)", stagger: 0.05 }
+        { scale: 0.94 },
+        { scale: 1, duration: 0.4, ease: "back.out(1.6)", stagger: 0.05 }
       );
     }, stageRef);
     return () => ctx.revert();
@@ -266,6 +268,7 @@ export default function Sorter() {
           {/* LEFT POLAROID */}
           <div className="sorter-left order-1">
             <ComparisonCard
+              key={`L-${L.id}`}
               member={L}
               tilt={-3}
               onPick={() => dispatch({ type: "PICK_LEFT" })}
@@ -299,6 +302,7 @@ export default function Sorter() {
           {/* RIGHT POLAROID */}
           <div className="sorter-right order-2 lg:order-3">
             <ComparisonCard
+              key={`R-${R.id}`}
               member={R}
               tilt={3}
               onPick={() => dispatch({ type: "PICK_RIGHT" })}
@@ -397,14 +401,21 @@ function HotkeyOverlay({ onClose, t }) {
 }
 
 function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
-  // Track per-member image-load state so the name and the photo can never
-  // appear out of sync. Re-keying on member.id forces a fresh <img> mount,
-  // and we hide it until decode completes (or errors out to the fallback).
+  // The parent re-keys this component by member.id on every pair change,
+  // so each instance starts fresh with loaded=false — no stale state to
+  // race the new image's first paint.
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef(null);
 
+  // Cached-image race: if the preloader already fetched the image, the
+  // browser may have it ready before React attaches the onLoad listener.
+  // Sync from the ref instead so we don't get stuck on the placeholder.
   useEffect(() => {
-    setLoaded(false);
-  }, [member.id]);
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, []);
 
   return (
     <div className="relative">
@@ -425,7 +436,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
             </div>
           )}
           <img
-            key={member.id}
+            ref={imgRef}
             src={member.imageUrl}
             alt={member.name}
             loading="eager"
