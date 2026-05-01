@@ -405,14 +405,14 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
   // so each instance starts fresh with loaded=false — no stale state to
   // race the new image's first paint.
   const [loaded, setLoaded] = useState(false);
-  const imgRef = useRef(null);
 
   // Cached-image race: if the preloader already fetched the image, the
   // browser may have it ready before React attaches the onLoad listener.
-  // Sync from the ref instead so we don't get stuck on the placeholder.
-  useEffect(() => {
-    const img = imgRef.current;
-    if (img && img.complete && img.naturalWidth > 0) {
+  // A callback ref runs synchronously when the <img> attaches, so we can
+  // detect already-decoded images and flip loaded immediately — avoids
+  // the "stuck on placeholder" hang for cached images.
+  const setImgRef = useCallback((node) => {
+    if (node && node.complete && node.naturalWidth > 0) {
       setLoaded(true);
     }
   }, []);
@@ -436,7 +436,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
             </div>
           )}
           <img
-            ref={imgRef}
+            ref={setImgRef}
             src={member.imageUrl}
             alt={member.name}
             loading="eager"

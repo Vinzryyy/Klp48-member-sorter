@@ -62,13 +62,8 @@ export default function Gift() {
       .sort((a, b) => a.target - b.target)[0]?.member ?? null;
   }, [requestedId]);
 
-  if (requestedId != null && !honoree) {
-    return <Navigate to="/birthday" replace />;
-  }
-
-  const theme = honoree ? getMemberTheme(honoree.id) : getMemberTheme(null);
-  const palette = PALETTE_CLASSES[theme.palette] ?? PALETTE_CLASSES.default;
-
+  // GSAP entrance — declared before the early return below so the hook
+  // order stays stable across redirect cases (rules of hooks).
   useEffect(() => {
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
@@ -88,6 +83,13 @@ export default function Gift() {
 
     return () => ctx.revert();
   }, []);
+
+  if (requestedId != null && !honoree) {
+    return <Navigate to="/birthday" replace />;
+  }
+
+  const theme = honoree ? getMemberTheme(honoree.id) : getMemberTheme(null);
+  const palette = PALETTE_CLASSES[theme.palette] ?? PALETTE_CLASSES.default;
 
   const handleGiftTap = () => {
     setGiftOpen((v) => !v);
@@ -773,9 +775,11 @@ function BigGiftBox({ opened }) {
 function FallingConfetti({ pool }) {
   // 30 pieces (was 50) — fewer simultaneous animations means smoother
   // playback on low-end devices. Skipped entirely under reduced motion.
+  // Random positions are computed once via useState lazy init so they
+  // stay stable across renders (useMemo with Math.random can re-roll).
   const reduced = useReducedMotion();
-  const pieces = useMemo(() => {
-    return Array.from({ length: 30 }).map((_, i) => ({
+  const [pieces] = useState(() =>
+    Array.from({ length: 30 }).map((_, i) => ({
       id: i,
       left: Math.random() * 100,
       drift: (Math.random() - 0.5) * 40,
@@ -784,8 +788,8 @@ function FallingConfetti({ pool }) {
       rotateEnd: (Math.random() - 0.5) * 720,
       size: 18 + Math.floor(Math.random() * 18),
       emoji: pool[i % pool.length],
-    }));
-  }, [pool]);
+    }))
+  );
 
   if (reduced) return null;
 
@@ -822,7 +826,10 @@ function FallingConfetti({ pool }) {
 }
 
 function ConfettiBurst({ theme }) {
-  const pieces = useMemo(() => {
+  // Random distances/delays computed once via useState lazy init —
+  // this component is keyed by burst count so it remounts per burst,
+  // and we don't want React Compiler re-rolling positions mid-animation.
+  const [pieces] = useState(() => {
     const pool =
       theme?.palette === "potato"
         ? ["🥔", "💛", "✨", "🎉", "🌷", "🥔"]
@@ -834,7 +841,7 @@ function ConfettiBurst({ theme }) {
       delay: Math.random() * 0.05,
       emoji: pool[i % pool.length],
     }));
-  }, [theme]);
+  });
 
   return (
     <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-40">
