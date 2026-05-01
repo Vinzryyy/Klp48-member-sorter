@@ -1,10 +1,16 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useReducer, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { gsap } from "gsap";
 import { useRankStore } from "../store/useRankStore";
 import { init, reducer } from "../lib/mergeSortMachine";
 import { useMagnetic } from "../lib/animations";
+import {
+  saveSession,
+  loadSession,
+  clearSession,
+  memberIdsMatch,
+} from "../lib/sortPersistence";
 
 import { ArrowLeft, RotateCcw, Undo2, Info } from "lucide-react";
 import SplitTitle from "../components/SplitTitle";
@@ -17,21 +23,30 @@ export default function Sorter() {
   const { t } = useTranslation();
   const { members, setRanking } = useRankStore();
 
-  useEffect(() => {
-    if (!members || members.length < 2) {
-      navigate("/");
+  const [state, dispatch] = useReducer(reducer, members, (mems) => {
+    // Resume from a saved session if its member set matches what's
+    // about to be sorted. Otherwise start a fresh shuffle.
+    const saved = loadSession();
+    if (saved && memberIdsMatch(saved.sessionMembers, mems)) {
+      return saved.state;
     }
-  }, [members, navigate]);
-
-  const [state, dispatch] = useReducer(reducer, members, init);
+    return init(mems);
+  });
   const [selectedProfile, setSelectedProfile] = useState(null);
 
   const restart = useCallback(() => {
+    clearSession();
     dispatch({ type: "RESET", members });
   }, [members]);
 
+  // Persist the in-progress sort so the user can resume after closing the tab.
+  useEffect(() => {
+    saveSession(state, members);
+  }, [state, members]);
+
   useEffect(() => {
     if (state.done && state.ranking) {
+      clearSession();
       setRanking(state.ranking);
       navigate("/results");
     }
@@ -138,11 +153,7 @@ export default function Sorter() {
   }, [pairKey]);
 
   if (members.length < 2) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-kawaii font-kawaii font-bold text-ink">
-        {t("notEnoughMembers")}
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   if (!state.left.length || !state.right.length) {
@@ -282,17 +293,17 @@ export default function Sorter() {
             className="sticker bg-white/80 px-4 py-2 rounded-full text-xs font-kawaii font-bold text-ink/70 inline-flex items-center gap-2 hover:bg-white transition"
           >
             <Kbd>←</Kbd> <Kbd>→</Kbd> <Kbd>space</Kbd>
-            <span className="font-script text-base">press ? for shortcuts</span>
+            <span className="font-script text-base">{t("hotkeys.hint")}</span>
           </button>
         </div>
       </div>
 
       <footer className="relative z-10 mt-12 pb-6 text-center font-script text-base text-ink/60">
-        © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
+        © {new Date().getFullYear()} <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
 
       {showHotkeys && (
-        <HotkeyOverlay onClose={() => setShowHotkeys(false)} />
+        <HotkeyOverlay onClose={() => setShowHotkeys(false)} t={t} />
       )}
 
       <ProfileModal
@@ -312,7 +323,7 @@ function Kbd({ children }) {
   );
 }
 
-function HotkeyOverlay({ onClose }) {
+function HotkeyOverlay({ onClose, t }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -320,13 +331,13 @@ function HotkeyOverlay({ onClose }) {
   }, [onClose]);
 
   const rows = [
-    { keys: ["←", "A"], label: "Pick left" },
-    { keys: ["→", "D"], label: "Pick right" },
-    { keys: ["Space", "="], label: "Tie / Equal" },
-    { keys: ["Z", "⌫"], label: "Undo" },
-    { keys: ["R"], label: "Restart" },
-    { keys: ["?"], label: "Toggle this overlay" },
-    { keys: ["Esc"], label: "Close overlay" },
+    { keys: ["←", "A"], label: t("hotkeys.pickLeft") },
+    { keys: ["→", "D"], label: t("hotkeys.pickRight") },
+    { keys: ["Space", "="], label: t("equal") },
+    { keys: ["Z", "⌫"], label: t("undo") },
+    { keys: ["R"], label: t("restart") },
+    { keys: ["?"], label: t("hotkeys.toggle") },
+    { keys: ["Esc"], label: t("hotkeys.close") },
   ];
 
   return (
@@ -338,8 +349,8 @@ function HotkeyOverlay({ onClose }) {
         className="sticker bg-white rounded-3xl p-6 max-w-sm w-full"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-kawaii font-bold text-xl text-ink mb-1">Shortcuts</h3>
-        <p className="font-script text-base text-ink/60 mb-4">go fast ♡</p>
+        <h3 className="font-kawaii font-bold text-xl text-ink mb-1">{t("hotkeys.title")}</h3>
+        <p className="font-script text-base text-ink/60 mb-4">{t("hotkeys.tagline")}</p>
         <ul className="space-y-2.5">
           {rows.map((r) => (
             <li key={r.label} className="flex items-center justify-between gap-3">
@@ -356,7 +367,7 @@ function HotkeyOverlay({ onClose }) {
           onClick={onClose}
           className="btn-pop bg-cream w-full mt-5 py-2 rounded-full font-kawaii font-bold text-ink text-sm"
         >
-          Got it
+          {t("hotkeys.gotIt")}
         </button>
       </div>
     </div>
