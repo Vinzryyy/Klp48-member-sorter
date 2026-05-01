@@ -84,7 +84,10 @@ export default function Gift() {
     return () => ctx.revert();
   }, []);
 
-  if (requestedId != null && !honoree) {
+  // Bounce out for unknown / locked IDs and for the no-honoree case
+  // (/gift with no member id and nobody unlocked yet) so we never render
+  // a half-empty celebration page.
+  if (!honoree) {
     return <Navigate to="/birthday" replace />;
   }
 
@@ -636,23 +639,32 @@ function CelebrationModal({ honoreeName, theme, t, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-ink/60 backdrop-blur-md overflow-hidden"
+      className="fixed inset-0 z-[100] bg-ink/60 backdrop-blur-md overflow-y-auto overflow-x-hidden"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={t("gift.celebration.modalAria")}
     >
-      {/* Falling confetti — covers the whole viewport */}
-      <FallingConfetti pool={surprisePool} />
+      {/* Falling confetti — fixed so it spans the viewport even when the
+          modal content is taller than the screen and scrolls. */}
+      <div className="fixed inset-0 pointer-events-none">
+        <FallingConfetti pool={surprisePool} />
+      </div>
 
-      {/* Close button — bigger tap target on mobile */}
+      {/* Close button — fixed to top-right of viewport so it stays put
+          when the modal content scrolls. Bigger tap target on mobile. */}
       <button
         onClick={onClose}
         aria-label={t("gift.celebration.close")}
-        className="absolute top-3 right-3 sm:top-6 sm:right-6 z-50 bg-white border-2 border-ink rounded-full p-2.5 sm:p-2 shadow-[3px_3px_0_#064e3b] hover:bg-cream transition active:scale-95"
+        className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50 bg-white border-2 border-ink rounded-full p-2.5 sm:p-2 shadow-[3px_3px_0_#064e3b] hover:bg-cream transition active:scale-95"
       >
         <X className="w-5 h-5 text-ink" />
       </button>
+
+      {/* Centring wrapper — min-h-full lets the modal stage sit centred
+          when it fits, and scroll naturally on landscape/short viewports
+          where the gift box + headline + button overflow vertically. */}
+      <div className="min-h-full flex items-center justify-center px-4 py-12">
 
       {/* Stage — clicking inside doesn't close */}
       <motion.div
@@ -700,6 +712,7 @@ function CelebrationModal({ honoreeName, theme, t, onClose }) {
           )}
         </AnimatePresence>
       </motion.div>
+      </div>
     </motion.div>
   );
 }
