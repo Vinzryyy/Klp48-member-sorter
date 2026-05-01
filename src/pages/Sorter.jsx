@@ -270,7 +270,7 @@ export default function Sorter() {
             </button>
 
             <p className="sorter-hint font-script text-base text-ink/50">
-              can't decide? tap equal
+              {t("tieHint")}
             </p>
           </div>
 
