@@ -127,9 +127,11 @@ export default function Sorter() {
           stagger: 0.03, duration: 0.55, ease: "back.out(1.6)",
         }, "-=0.2")
         .from(".sorter-progress", { scaleX: 0, transformOrigin: "left center", duration: 0.6 }, "-=0.2")
-        .from(".sorter-left", { x: -80, opacity: 0, duration: 0.7, ease: "back.out(1.4)" }, "-=0.3")
-        .from(".sorter-right", { x: 80, opacity: 0, duration: 0.7, ease: "back.out(1.4)" }, "<")
-        .from(".sorter-vs", { scale: 0, opacity: 0, rotate: 180, duration: 0.6, ease: "back.out(2)" }, "-=0.4")
+        // Card entrance animations removed — gsap.from was leaving inline
+        // transform: translate(±80px) stuck on .sorter-left / .sorter-right
+        // even after the timeline completed, which permanently shoved the
+        // two cards 80px apart and broke the mobile layout.
+        .from(".sorter-vs", { scale: 0, opacity: 0, rotate: 180, duration: 0.6, ease: "back.out(2)" }, "-=0.2")
         .from(".sorter-equal", { y: 20, opacity: 0, duration: 0.4 }, "-=0.3")
         .from(".sorter-hint", { opacity: 0, duration: 0.4 }, "-=0.2");
     }, stageRef);
