@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
-import { Globe, Star, Users, Heart, RotateCw, X } from "lucide-react";
+import { Globe, Star, Users, Heart, RotateCw, X, Cake } from "lucide-react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 
@@ -214,14 +214,21 @@ export default function Home() {
             <span className="hidden sm:inline truncate">KLP48 Sorter</span>
           </Link>
 
-          {/* Members nav as chunky tag */}
-          <div className="flex justify-center min-w-0">
+          {/* Members + Birthday nav */}
+          <div className="flex justify-center items-center min-w-0 gap-2">
             <Link
               to="/members"
-              className="btn-pop bg-sakura-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-4 py-2 rounded-full"
+              className="btn-pop bg-sakura-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full"
             >
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Members</span>
+            </Link>
+            <Link
+              to="/birthday"
+              className="btn-pop bg-emerald-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full"
+            >
+              <Cake className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("birthday.headerTitle")}</span>
             </Link>
           </div>
 

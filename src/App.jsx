@@ -6,6 +6,8 @@ const Home = lazy(() => import("./pages/Home"));
 const Sorter = lazy(() => import("./pages/Sorter"));
 const Results = lazy(() => import("./pages/Results"));
 const Members = lazy(() => import("./pages/Members"));
+const Birthday = lazy(() => import("./pages/Birthday"));
+const Gift = lazy(() => import("./pages/Gift"));
 
 const RouteFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-kawaii">
@@ -43,6 +45,9 @@ function App() {
           <Route path="/sorter" element={<Sorter />} />
           <Route path="/results" element={<Results />} />
           <Route path="/members" element={<Members />} />
+          <Route path="/birthday" element={<Birthday />} />
+          <Route path="/gift" element={<Gift />} />
+          <Route path="/gift/:memberId" element={<Gift />} />
         </Routes>
       </Suspense>
     </>
