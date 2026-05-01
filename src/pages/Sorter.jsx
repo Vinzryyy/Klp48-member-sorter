@@ -127,8 +127,8 @@ export default function Sorter() {
           stagger: 0.03, duration: 0.55, ease: "back.out(1.6)",
         }, "-=0.2")
         .from(".sorter-progress", { scaleX: 0, transformOrigin: "left center", duration: 0.6 }, "-=0.2")
-        .from(".sorter-left", { x: -80, opacity: 0, rotate: -8, duration: 0.7, ease: "back.out(1.4)" }, "-=0.3")
-        .from(".sorter-right", { x: 80, opacity: 0, rotate: 8, duration: 0.7, ease: "back.out(1.4)" }, "<")
+        .from(".sorter-left", { x: -80, opacity: 0, duration: 0.7, ease: "back.out(1.4)" }, "-=0.3")
+        .from(".sorter-right", { x: 80, opacity: 0, duration: 0.7, ease: "back.out(1.4)" }, "<")
         .from(".sorter-vs", { scale: 0, opacity: 0, rotate: 180, duration: 0.6, ease: "back.out(2)" }, "-=0.4")
         .from(".sorter-equal", { y: 20, opacity: 0, duration: 0.4 }, "-=0.3")
         .from(".sorter-hint", { opacity: 0, duration: 0.4 }, "-=0.2");
@@ -265,12 +265,11 @@ export default function Sorter() {
         {/* COMPARISON GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
 
-          {/* LEFT POLAROID */}
+          {/* LEFT CARD */}
           <div className="sorter-left order-1">
             <ComparisonCard
               key={`L-${L.id}`}
               member={L}
-              tilt={-3}
               onPick={() => dispatch({ type: "PICK_LEFT" })}
               onInfo={() => setSelectedProfile(L)}
               t={t}
@@ -299,12 +298,11 @@ export default function Sorter() {
             </p>
           </div>
 
-          {/* RIGHT POLAROID */}
+          {/* RIGHT CARD */}
           <div className="sorter-right order-2 lg:order-3">
             <ComparisonCard
               key={`R-${R.id}`}
               member={R}
-              tilt={3}
               onPick={() => dispatch({ type: "PICK_RIGHT" })}
               onInfo={() => setSelectedProfile(R)}
               t={t}
@@ -400,7 +398,7 @@ function HotkeyOverlay({ onClose, t }) {
   );
 }
 
-function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
+function ComparisonCard({ member, onPick, onInfo, t }) {
   // The parent re-keys this component by member.id on every pair change,
   // so each instance starts fresh with loaded=false — no stale state to
   // race the new image's first paint.
