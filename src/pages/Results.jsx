@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { toPng } from "html-to-image";
+import { toPng, toBlob } from "html-to-image";
 import { gsap } from "gsap";
 import { useRankStore } from "../store/useRankStore";
 
-import { ArrowLeft, Image as ImageIcon, Crown, Trophy, Medal } from "lucide-react";
+import { ArrowLeft, Image as ImageIcon, Crown, Trophy, Medal, Home as HomeIcon } from "lucide-react";
 import SplitTitle from "../components/SplitTitle";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
@@ -49,6 +49,11 @@ export default function Results() {
   const fullRef = useRef(null);
   const tierRef = useRef(null);
   const stageRef = useRef(null);
+
+  // Pre-generated File for navigator.share — populated in the background
+  // after entrance animations so the share click on iOS happens within
+  // the user-gesture window (no long awaits between tap and share()).
+  const shareFileRef = useRef(null);
 
   // Entrance choreography — fires once on mount.
   useEffect(() => {
@@ -98,10 +103,57 @@ export default function Results() {
     return () => ctx.revert();
   }, [view, ranking]);
 
+  // Pre-generate the Top 3 share image in the background. iOS Safari only
+  // honors navigator.share() within a tight window after the user gesture,
+  // so we cannot afford long awaits inside the click handler.
+  useEffect(() => {
+    if (view !== "ranking") return;
+    if (!ranking.length) return;
+    let cancelled = false;
+    shareFileRef.current = null;
+
+    const run = async () => {
+      // Wait for the podium cards to mount (after entrance choreography starts).
+      await new Promise((r) => setTimeout(r, 700));
+      if (cancelled || !top3Ref.current) return;
+      try {
+        await waitForImages(top3Ref.current);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        // Known WebKit quirk: first toBlob/toPng call sometimes returns a
+        // partial image, so warm up once on iOS.
+        if (isIOS) {
+          await toBlob(top3Ref.current, { cacheBust: true, backgroundColor: "#fff8f0" });
+        }
+        const blob = await toBlob(top3Ref.current, {
+          cacheBust: true,
+          pixelRatio: isIOS ? 1 : 2,
+          backgroundColor: "#fff8f0",
+        });
+        if (cancelled || !blob) return;
+        shareFileRef.current = new File([blob], "KLP48-Ranking.png", { type: "image/png" });
+      } catch (err) {
+        console.warn("[Results] Share image pre-generation failed:", err);
+      }
+    };
+
+    run();
+    return () => { cancelled = true; };
+  }, [view, ranking]);
+
   if (!ranking.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-kawaii font-kawaii font-bold text-ink text-lg">
-        {t("noRanking")}
+      <div className="min-h-screen flex items-center justify-center bg-kawaii p-6">
+        <div className="sticker bg-white max-w-sm w-full p-8 rounded-3xl text-center space-y-5">
+          <div className="font-script text-3xl text-sakura-500">¯\_(ツ)_/¯</div>
+          <p className="font-kawaii font-bold text-ink text-lg">{t("noRanking")}</p>
+          <button
+            onClick={() => navigate("/")}
+            className="btn-pop bg-gradient-to-r from-emerald-300 to-emerald-500 text-white font-kawaii font-bold rounded-full px-6 py-3 inline-flex items-center gap-2"
+          >
+            <HomeIcon className="w-4 h-4" />
+            {t("backToHome")}
+          </button>
+        </div>
       </div>
     );
   }
@@ -165,37 +217,45 @@ export default function Results() {
     const top3Names = podium.map((m, i) => `${i + 1}. ${m.name}`).join("\n");
     const shareUrl = window.location.origin;
     const shareText = `My KLP48 Oshi Ranking! 🏆\n\n${top3Names}\n\nCheck it out here: ${shareUrl}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
-    try {
-      if (!top3Ref.current) return;
-      await waitForImages(top3Ref.current);
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS) await toPng(top3Ref.current, { cacheBust: true });
+    const cachedFile = shareFileRef.current;
 
-      const dataUrl = await toPng(top3Ref.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: "#fff8f0",
-      });
-
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-      const file = new File([blob], "KLP48-Ranking.png", { type: "image/png" });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    // Best path: pre-generated image + Web Share API. Calling share() before
+    // any awaits keeps the iOS user-gesture context valid.
+    if (cachedFile && navigator.canShare?.({ files: [cachedFile] })) {
+      try {
         await navigator.share({
-          files: [file],
+          files: [cachedFile],
           title: "KLP48 Member Sorter",
           text: shareText,
         });
-      } else {
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-        window.open(twitterUrl, "_blank");
+        return;
+      } catch (err) {
+        if (err?.name === "AbortError") return; // user dismissed the sheet
+        console.warn("[Results] File share failed, falling back to text:", err);
       }
-    } catch (error) {
-      console.error("Share failed", error);
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
     }
+
+    // Text-only Web Share API — works on most modern browsers/iOS even
+    // when file share isn't supported or the gesture window has expired.
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "KLP48 Member Sorter",
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        if (err?.name === "AbortError") return;
+        console.warn("[Results] Text share failed, falling back to Twitter:", err);
+      }
+    }
+
+    // Last resort: open Twitter intent. window.open is blocked from async
+    // callbacks on iOS, so navigate the current tab instead.
+    window.location.href = twitterUrl;
   };
 
   const podiumIcons = [Crown, Trophy, Medal];
@@ -216,7 +276,7 @@ export default function Results() {
         <div className="text-center mb-6 space-y-1">
           <div className="results-greet font-script text-xl text-sakura-600">your oshi ranking ♡</div>
           <h1 className="results-title font-kawaii font-bold text-2xl sm:text-4xl md:text-5xl text-emerald-600 squiggle-underline drop-shadow-[2px_2px_0_#be185d] sm:drop-shadow-[3px_3px_0_#be185d] inline-block break-words px-2">
-            <SplitTitle text={"🏆 My Top 3 Oshi"} />
+            <SplitTitle text={t("top3")} />
           </h1>
         </div>
 
@@ -239,7 +299,7 @@ export default function Results() {
                   : "text-ink hover:bg-cream"
               }`}
             >
-              Ranking
+              {t("ranking")}
             </button>
             <button
               onClick={() => setView("tier")}
@@ -249,7 +309,7 @@ export default function Results() {
                   : "text-ink hover:bg-cream"
               }`}
             >
-              Tier
+              {t("tier")}
             </button>
           </div>
         </div>
@@ -264,7 +324,7 @@ export default function Results() {
                 <div className="washi-tape -top-3 left-1/2 -translate-x-1/2 transform -rotate-2" />
 
                 <h2 className="font-kawaii font-bold text-2xl sm:text-3xl text-center text-ink mb-6">
-                  Top 3 ⭐
+                  {t("top3Section")}
                 </h2>
 
                 <div className="grid grid-cols-3 gap-2 sm:gap-6 items-end">
@@ -334,7 +394,7 @@ export default function Results() {
                         {m.name}
                       </div>
                       <div className="font-script text-xs text-ink/60 truncate">
-                        Gen {m.generation}
+                        {t("generationLabel", { gen: m.generation })}
                       </div>
                     </div>
                   </div>
@@ -362,7 +422,7 @@ export default function Results() {
                     onClick={() => exportImage(fullRef, "KLP48-FullRanking.png")}
                     className="btn-pop bg-cream px-4 py-2 rounded-full font-kawaii font-bold text-sm text-ink"
                   >
-                    📋 Full List
+                    📋 {t("fullList")}
                   </button>
                   <button
                     onClick={handleShare}
@@ -455,7 +515,7 @@ export default function Results() {
       </div>
 
       <footer className="relative z-10 mt-12 pb-6 text-center font-script text-base text-ink/60">
-        © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
+        © {new Date().getFullYear()} <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
     </div>
   );
