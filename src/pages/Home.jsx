@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
-import { Globe, Star, Users, Heart } from "lucide-react";
+import { Globe, Star, Users, Heart, RotateCw, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 
@@ -18,6 +18,7 @@ import { members } from "../data/members";
 import { useRankStore } from "../store/useRankStore";
 import { shuffle } from "../lib/shuffle";
 import { useMagnetic } from "../lib/animations";
+import { peekSession, loadSession, clearSession } from "../lib/sortPersistence";
 import SplitTitle from "../components/SplitTitle";
 import ProfileModal from "../components/ProfileModal";
 
@@ -32,6 +33,7 @@ export default function Home() {
   const [generation, setGeneration] = useState("all");
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [error, setError] = useState("");
+  const [resumePeek, setResumePeek] = useState(() => peekSession());
 
   // GSAP entrance choreography
   const heroRef = useRef(null);
@@ -85,7 +87,7 @@ export default function Home() {
           duration: 0.8,
           ease: "back.out(1.4)",
         }, "-=0.9");
-    });
+    }, heroRef);
 
     return () => ctx.revert();
   }, []);
@@ -108,13 +110,41 @@ export default function Home() {
     []
   );
 
+  const activeCount = useMemo(
+    () => members.filter((m) => m.status === "active").length,
+    []
+  );
+
+  const generationCount = useMemo(
+    () => Math.max(...members.map((m) => m.generation)),
+    []
+  );
+
   const handleStart = () => {
     if (filteredMembers.length < 2) {
       setError(t("alertMin"));
       return;
     }
+    // Starting a fresh sort — abandon any saved session whose member set
+    // would otherwise auto-resume in Sorter.
+    clearSession();
     setMembers(filteredMembers);
     navigate("/sorter");
+  };
+
+  const handleResume = () => {
+    const saved = loadSession();
+    if (!saved) {
+      setResumePeek(null);
+      return;
+    }
+    setMembers(saved.sessionMembers);
+    navigate("/sorter");
+  };
+
+  const handleDiscardSession = () => {
+    clearSession();
+    setResumePeek(null);
   };
 
   const changeLanguage = (lng) => {
@@ -135,25 +165,39 @@ export default function Home() {
     <main className="min-h-screen bg-kawaii text-ink relative overflow-hidden font-sans">
 
       {/* Soft pink + emerald gradient blobs (sit BELOW halftone) */}
-      <div className="absolute -top-32 -left-20 w-[28rem] h-[28rem] bg-sakura-200/50 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-40 -right-24 w-[24rem] h-[24rem] bg-emerald-300/40 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/3 w-[22rem] h-[22rem] bg-sakura-100 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-32 -left-20 w-[28rem] h-[28rem] bg-sakura-200/50 rounded-full blur-3xl pointer-events-none animate-aurora motion-reduce:animate-none" />
+      <div className="absolute top-40 -right-24 w-[24rem] h-[24rem] bg-emerald-300/40 rounded-full blur-3xl pointer-events-none animate-aurora motion-reduce:animate-none" style={{ animationDelay: "-6s", animationDuration: "22s" }} />
+      <div className="absolute bottom-0 left-1/3 w-[22rem] h-[22rem] bg-sakura-100 rounded-full blur-3xl pointer-events-none animate-aurora motion-reduce:animate-none" style={{ animationDelay: "-12s", animationDuration: "26s" }} />
 
-      {/* Sparkle decorations */}
+      {/* Floating idol particles — twinkling dots layer */}
+      <div className="idol-particles" aria-hidden="true">
+        {Array.from({ length: 12 }).map((_, i) => <span key={i} />)}
+      </div>
+
+      {/* Sparkle decorations — drift + twinkle continuously */}
       {sparkles.map((s, i) => (
         <motion.div
           key={i}
           aria-hidden="true"
           initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: s.delay, type: "spring", stiffness: 200 }}
-          className="absolute text-sakura-500 pointer-events-none animate-twinkle"
+          animate={{
+            opacity: [0.5, 1, 0.5],
+            scale: [0.9, 1.2, 0.9],
+            y: [0, -14, 0],
+            rotate: [s.rotate - 6, s.rotate + 6, s.rotate - 6],
+          }}
+          transition={{
+            duration: 4.5 + i * 0.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: s.delay,
+          }}
+          className="absolute text-sakura-500 pointer-events-none"
           style={{
             top: s.top,
             left: s.left,
             right: s.right,
             fontSize: s.size,
-            transform: `rotate(${s.rotate}deg)`,
           }}
         >
           ✦
@@ -199,6 +243,75 @@ export default function Home() {
         </div>
       </header>
 
+      {/* MARQUEE BELT — slow scrolling vibe ribbon */}
+      <div className="relative z-10 max-w-7xl mx-auto mb-2 overflow-hidden mask-fade px-4 sm:px-6">
+        <motion.div
+          aria-hidden="true"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
+          className="flex gap-10 whitespace-nowrap font-kawaii font-bold text-emerald-700/70 text-sm sm:text-base"
+        >
+          {Array.from({ length: 2 }).flatMap((_, k) => [
+            <span key={`a${k}`}>🌸 your oshi awaits</span>,
+            <span key={`b${k}`}>💚 KLP48 ranking</span>,
+            <span key={`c${k}`} className="text-sakura-600">✦ tournament style</span>,
+            <span key={`d${k}`}>🍀 pick · sort · share</span>,
+            <span key={`e${k}`} className="text-sakura-600">♡ made for fans</span>,
+            <span key={`f${k}`}>✨ {activeCount} members ready</span>,
+          ])}
+        </motion.div>
+      </div>
+
+      {/* RESUME BANNER — only rendered when a saved session exists */}
+      {resumePeek && (
+        <motion.div
+          initial={{ y: -16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22 }}
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-6"
+        >
+          <div className="sticker bg-white relative px-4 sm:px-5 py-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <button
+              onClick={handleDiscardSession}
+              aria-label={t("resumeDiscard")}
+              className="absolute top-2 right-2 p-1.5 rounded-full text-ink/60 hover:text-ink hover:bg-cream-deep transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex-1 min-w-0 pr-6">
+              <div className="flex items-center gap-2 font-kawaii font-bold text-ink text-base sm:text-lg">
+                <RotateCw className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <span className="truncate">{t("resumeTitle")}</span>
+              </div>
+              <p className="font-script text-base text-ink/70 mt-0.5">
+                {t("resumeProgress", {
+                  progress: resumePeek.progress,
+                  comparisons: resumePeek.comparisons,
+                })}
+                {" · "}
+                {t("resumeMembers", { count: resumePeek.total })}
+              </p>
+
+              {/* Progress bar */}
+              <div className="mt-2 bg-cream-deep rounded-full h-2 overflow-hidden border-2 border-ink">
+                <div
+                  className="h-full bg-gradient-to-r from-sakura-300 via-sakura-400 to-emerald-400 transition-all duration-500"
+                  style={{ width: `${resumePeek.progress}%` }}
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleResume}
+              className="btn-pop bg-gradient-to-r from-emerald-300 to-emerald-500 text-white font-kawaii font-bold rounded-full px-6 py-3 text-sm sm:text-base whitespace-nowrap"
+            >
+              ▶ {t("resumeCta")}
+            </button>
+          </div>
+        </motion.div>
+      )}
+
       {/* MAIN */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 sm:px-6 relative z-10 pt-4 pb-20">
 
@@ -212,7 +325,7 @@ export default function Home() {
           {/* TITLE — per-letter spans for GSAP letter stagger */}
           <div className="space-y-2">
             <h1 className="hero-title font-kawaii font-bold leading-[0.95] text-4xl sm:text-6xl xl:text-7xl tracking-tight break-words">
-              <span className="inline-block squiggle-underline text-emerald-600 drop-shadow-[4px_4px_0_#be185d]">
+              <span className="inline-block squiggle-underline text-emerald-600 drop-shadow-[3px_3px_0_#be185d]">
                 <SplitTitle text={t("title")} />
               </span>
             </h1>
@@ -257,7 +370,7 @@ export default function Home() {
             <button
               ref={ctaRef}
               onClick={handleStart}
-              className="btn-pop bg-gradient-to-r from-emerald-300 to-emerald-500 px-8 py-4 text-lg font-kawaii font-bold rounded-full text-white"
+              className="btn-pop bg-gradient-to-r from-emerald-300 via-emerald-400 to-emerald-500 bg-[length:200%_auto] animate-gradient-shift motion-reduce:animate-none px-8 py-4 text-lg font-kawaii font-bold rounded-full text-white"
             >
               💚 {t("startRanking")}
             </button>
@@ -274,7 +387,7 @@ export default function Home() {
               🎤 {members.length} {t("members")}
             </span>
             <span className="sticker bg-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-emerald-700">
-              ✨ 2 {t("generation")}
+              ✨ {generationCount} {t("generation")}
             </span>
             <span className="sticker bg-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-kawaii font-bold text-emerald-700">
               💿 {t("active")}
@@ -340,7 +453,7 @@ export default function Home() {
               <button
                 ref={ctaPinkRef}
                 onClick={handleStart}
-                className="btn-pop-pink w-full h-14 rounded-full bg-gradient-to-r from-sakura-300 to-sakura-500 text-white font-kawaii font-bold text-lg"
+                className="btn-pop-pink w-full h-14 rounded-full bg-gradient-to-r from-sakura-300 via-sakura-400 to-sakura-500 bg-[length:200%_auto] animate-gradient-shift motion-reduce:animate-none text-white font-kawaii font-bold text-lg"
               >
                 {t("start")} →
               </button>
@@ -362,7 +475,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="relative z-10 pb-8 text-center font-script text-base text-ink/60">
-        © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
+        © {new Date().getFullYear()} <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
 
       {/* Profile Modal */}
