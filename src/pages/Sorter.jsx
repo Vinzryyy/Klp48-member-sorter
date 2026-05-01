@@ -425,7 +425,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
         style={{ "--tilt": `${tilt}deg` }}
         aria-label={`Pick ${member.name}`}
       >
-        <div className="relative w-full h-[220px] sm:h-[300px] lg:h-[440px] bg-cream overflow-hidden">
+        <div className="relative w-full aspect-[3/4] sm:aspect-auto sm:h-[300px] lg:h-[440px] bg-cream overflow-hidden">
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-cream">
               <div className="flex gap-1.5">
@@ -447,7 +447,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
               if (e.target.src !== IMAGE_FALLBACK) e.target.src = IMAGE_FALLBACK;
               setLoaded(true);
             }}
-            className={`w-full h-full object-cover transition-opacity duration-200 ${
+            className={`w-full h-full object-cover object-top transition-opacity duration-200 ${
               loaded ? "opacity-100" : "opacity-0"
             }`}
           />
