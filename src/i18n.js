@@ -43,6 +43,41 @@ i18n.use(initReactI18next).init({
 
         alertMin: "Please select at least 2 members!",
 
+        /* RESUME BANNER */
+        resumeTitle: "Continue your last run",
+        resumeProgress: "{{progress}}% done · {{comparisons}} comparisons",
+        resumeMembers: "{{count}} members in this session",
+        resumeCta: "Resume",
+        resumeDiscard: "Discard",
+
+        /* HOTKEYS OVERLAY */
+        hotkeys: {
+          title: "Shortcuts",
+          tagline: "go fast ♡",
+          hint: "press ? for shortcuts",
+          gotIt: "Got it",
+          pickLeft: "Pick left",
+          pickRight: "Pick right",
+          toggle: "Toggle this overlay",
+          close: "Close overlay",
+        },
+
+        /* PROFILE MODAL */
+        profile: {
+          close: "Close",
+          nickname: "Nickname",
+          birthDate: "Birth Date",
+          hobbies: "Hobbies",
+          activeBadge: "💚 Active",
+          graduatedBadge: "🎓 Graduated",
+          notAvailable: "N/A",
+        },
+
+        /* RESULTS EXTRAS */
+        top3Section: "Top 3 ⭐",
+        fullList: "Full List",
+        backToHome: "Back to Home",
+
         /* SORTER */
         notEnoughMembers: "Not enough members to start sorting.",
         preparing: "Preparing comparison...",
@@ -85,6 +120,7 @@ i18n.use(initReactI18next).init({
           showingCount: "Showing {{count}} members",
           noResults: "No members found matching your search.",
           generation: "Gen {{gen}}",
+          graduatedShort: " · grad",
         },
       },
     },
@@ -118,6 +154,41 @@ i18n.use(initReactI18next).init({
         fansToday: "粉丝今日参与",
 
         alertMin: "请至少选择 2 名成员！",
+
+        /* RESUME BANNER */
+        resumeTitle: "继续上次的排序",
+        resumeProgress: "已完成 {{progress}}% · {{comparisons}} 次比较",
+        resumeMembers: "本次共 {{count}} 名成员",
+        resumeCta: "继续",
+        resumeDiscard: "放弃",
+
+        /* HOTKEYS OVERLAY */
+        hotkeys: {
+          title: "快捷键",
+          tagline: "加速 ♡",
+          hint: "按 ? 显示快捷键",
+          gotIt: "知道了",
+          pickLeft: "选左边",
+          pickRight: "选右边",
+          toggle: "切换此面板",
+          close: "关闭面板",
+        },
+
+        /* PROFILE MODAL */
+        profile: {
+          close: "关闭",
+          nickname: "昵称",
+          birthDate: "生日",
+          hobbies: "爱好",
+          activeBadge: "💚 在籍",
+          graduatedBadge: "🎓 毕业",
+          notAvailable: "无",
+        },
+
+        /* RESULTS EXTRAS */
+        top3Section: "前三 ⭐",
+        fullList: "完整列表",
+        backToHome: "返回首页",
 
         notEnoughMembers: "成员不足。",
         preparing: "准备中…",
@@ -158,6 +229,7 @@ i18n.use(initReactI18next).init({
           showingCount: "显示 {{count}} 名成员",
           noResults: "没有找到匹配的成员。",
           generation: "{{gen}} 期生",
+          graduatedShort: " · 卒",
         },
       },
     },
@@ -191,6 +263,41 @@ i18n.use(initReactI18next).init({
         fansToday: "peminat hari ini",
 
         alertMin: "Pilih sekurang-kurangnya 2 ahli!",
+
+        /* RESUME BANNER */
+        resumeTitle: "Sambung susunan terakhir",
+        resumeProgress: "{{progress}}% selesai · {{comparisons}} perbandingan",
+        resumeMembers: "{{count}} ahli dalam sesi ini",
+        resumeCta: "Sambung",
+        resumeDiscard: "Buang",
+
+        /* HOTKEYS OVERLAY */
+        hotkeys: {
+          title: "Pintasan",
+          tagline: "Cepat ♡",
+          hint: "tekan ? untuk pintasan",
+          gotIt: "OK",
+          pickLeft: "Pilih kiri",
+          pickRight: "Pilih kanan",
+          toggle: "Togol panel ini",
+          close: "Tutup panel",
+        },
+
+        /* PROFILE MODAL */
+        profile: {
+          close: "Tutup",
+          nickname: "Nama Panggilan",
+          birthDate: "Tarikh Lahir",
+          hobbies: "Minat",
+          activeBadge: "💚 Aktif",
+          graduatedBadge: "🎓 Tamat",
+          notAvailable: "Tiada",
+        },
+
+        /* RESULTS EXTRAS */
+        top3Section: "Top 3 ⭐",
+        fullList: "Senarai Penuh",
+        backToHome: "Kembali ke Laman Utama",
 
         notEnoughMembers: "Ahli tidak mencukupi.",
         preparing: "Menyediakan...",
@@ -231,6 +338,7 @@ i18n.use(initReactI18next).init({
           showingCount: "Menunjukkan {{count}} ahli",
           noResults: "Tiada ahli ditemui yang sepadan dengan carian anda.",
           generation: "Gen {{gen}}",
+          graduatedShort: " · tamat",
         },
       },
     },
@@ -264,6 +372,41 @@ i18n.use(initReactI18next).init({
         fansToday: "今日のファン",
 
         alertMin: "2人以上選択してください！",
+
+        /* RESUME BANNER */
+        resumeTitle: "前回の続きから",
+        resumeProgress: "{{progress}}% 完了 · {{comparisons}} 回比較",
+        resumeMembers: "{{count}} 人で進行中",
+        resumeCta: "再開",
+        resumeDiscard: "破棄",
+
+        /* HOTKEYS OVERLAY */
+        hotkeys: {
+          title: "ショートカット",
+          tagline: "速く ♡",
+          hint: "? でショートカット表示",
+          gotIt: "OK",
+          pickLeft: "左を選ぶ",
+          pickRight: "右を選ぶ",
+          toggle: "このパネルの切替",
+          close: "パネルを閉じる",
+        },
+
+        /* PROFILE MODAL */
+        profile: {
+          close: "閉じる",
+          nickname: "ニックネーム",
+          birthDate: "誕生日",
+          hobbies: "趣味",
+          activeBadge: "💚 現役",
+          graduatedBadge: "🎓 卒業",
+          notAvailable: "なし",
+        },
+
+        /* RESULTS EXTRAS */
+        top3Section: "トップ3 ⭐",
+        fullList: "全リスト",
+        backToHome: "ホームに戻る",
 
         notEnoughMembers: "人数が足りません。",
         preparing: "準備中…",
@@ -304,6 +447,7 @@ i18n.use(initReactI18next).init({
           showingCount: "{{count}} 人のメンバーを表示中",
           noResults: "検索条件に一致するメンバーが見つかりませんでした。",
           generation: "{{gen}} 期生",
+          graduatedShort: " · 卒",
         },
       },
     },
