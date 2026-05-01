@@ -425,7 +425,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
         style={{ "--tilt": `${tilt}deg` }}
         aria-label={`Pick ${member.name}`}
       >
-        <div className="relative w-full aspect-[3/4] sm:aspect-auto sm:h-[300px] lg:h-[440px] bg-cream overflow-hidden">
+        <div className="relative w-full h-[260px] sm:h-[320px] lg:h-[440px] bg-cream overflow-hidden">
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-cream">
               <div className="flex gap-1.5">
