@@ -119,7 +119,15 @@ export default function Sorter() {
     if (reduced || !stageRef.current) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      // clearProps: "transform" tells GSAP to strip the inline transform
+      // it set as the from-state once each tween finishes. Without it,
+      // the from-state translate(±80px), translate(0, 20px), scaleX(0)
+      // etc. stick on the elements indefinitely — caused the cards to
+      // sit 80px apart, the equal button to float 20px low, and could
+      // have left the progress bar at scaleX:0 (invisible).
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out", clearProps: "transform" },
+      });
       tl.from(".sorter-controls > *", { y: -20, opacity: 0, stagger: 0.08, duration: 0.5 })
         .from(".sorter-greet", { y: 12, opacity: 0, duration: 0.4 }, "-=0.2")
         .from(".sorter-title .letter", {
@@ -127,10 +135,6 @@ export default function Sorter() {
           stagger: 0.03, duration: 0.55, ease: "back.out(1.6)",
         }, "-=0.2")
         .from(".sorter-progress", { scaleX: 0, transformOrigin: "left center", duration: 0.6 }, "-=0.2")
-        // Card entrance animations removed — gsap.from was leaving inline
-        // transform: translate(±80px) stuck on .sorter-left / .sorter-right
-        // even after the timeline completed, which permanently shoved the
-        // two cards 80px apart and broke the mobile layout.
         .from(".sorter-vs", { scale: 0, opacity: 0, rotate: 180, duration: 0.6, ease: "back.out(2)" }, "-=0.2")
         .from(".sorter-equal", { y: 20, opacity: 0, duration: 0.4 }, "-=0.3")
         .from(".sorter-hint", { opacity: 0, duration: 0.4 }, "-=0.2");
@@ -172,7 +176,7 @@ export default function Sorter() {
       gsap.fromTo(
         [".sorter-left", ".sorter-right"],
         { scale: 0.94 },
-        { scale: 1, duration: 0.4, ease: "back.out(1.6)", stagger: 0.05 }
+        { scale: 1, duration: 0.4, ease: "back.out(1.6)", stagger: 0.05, clearProps: "transform" }
       );
     }, stageRef);
     return () => ctx.revert();
