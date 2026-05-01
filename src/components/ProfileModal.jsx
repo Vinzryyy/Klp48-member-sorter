@@ -1,11 +1,63 @@
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Instagram, Calendar, Heart, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function ProfileModal({ member, isOpen, onClose }) {
   const { t } = useTranslation();
+  const modalRef = useRef(null);
+
+  // Focus management: trap Tab inside the modal, close on Esc, and
+  // restore focus to the previously-focused element on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    const previouslyFocused = document.activeElement;
+
+    // Defer the initial focus until after framer-motion has mounted the node.
+    const focusTimer = setTimeout(() => {
+      const root = modalRef.current;
+      if (!root) return;
+      const focusables = root.querySelectorAll(FOCUSABLE_SELECTOR);
+      if (focusables.length > 0) focusables[0].focus();
+    }, 0);
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = modalRef.current;
+      if (!root) return;
+      const focusables = root.querySelectorAll(FOCUSABLE_SELECTOR);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      document.removeEventListener("keydown", onKeyDown);
+      // Restore focus to whoever opened the modal.
+      if (previouslyFocused && typeof previouslyFocused.focus === "function") {
+        previouslyFocused.focus();
+      }
+    };
+  }, [isOpen, onClose]);
+
   if (!member) return null;
 
   return (
@@ -23,6 +75,10 @@ export default function ProfileModal({ member, isOpen, onClose }) {
 
           {/* Modal */}
           <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profile-modal-title"
             initial={{ scale: 0.85, opacity: 0, rotate: -3 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0.85, opacity: 0, rotate: 3 }}
@@ -63,7 +119,7 @@ export default function ProfileModal({ member, isOpen, onClose }) {
               {/* Info */}
               <div className="w-full md:w-1/2 p-5 pt-4 md:pt-8 space-y-4">
                 <div>
-                  <h2 className="font-kawaii font-bold text-2xl sm:text-3xl text-emerald-700 leading-tight">
+                  <h2 id="profile-modal-title" className="font-kawaii font-bold text-2xl sm:text-3xl text-emerald-700 leading-tight">
                     {member.name}
                   </h2>
                   <p className="font-script text-base text-ink/60">{member.fullName}</p>
