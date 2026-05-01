@@ -321,6 +321,12 @@
     background-image: radial-gradient(rgba(236, 72, 153, 0.15) 1.5px, transparent 1.6px);
     background-size: 22px 22px;
   }
+
+  /* ↔️ Soft fade on horizontal edges — for marquee belts. */
+  .mask-fade {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
 }
 
 /* ============================================================
@@ -372,5 +378,10 @@
   .polaroid {
     animation: none !important;
     transition: none !important;
+  }
+  /* Belt-and-suspenders: also disable inline gradient text shine in case
+     the browser missed the class-targeted rule above. */
+  .idol-text-shine {
+    background-position: 0% 50% !important;
   }
 }
