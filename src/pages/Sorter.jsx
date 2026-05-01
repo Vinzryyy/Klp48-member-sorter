@@ -137,6 +137,28 @@ export default function Sorter() {
     return () => ctx.revert();
   }, []);
 
+  // Preload upcoming images so the next swap is already in cache.
+  // Covers the rest of the current merge run plus the first member of the
+  // next two runs in the stack — that's the realistic "next 4–6" the user
+  // will see regardless of which side they pick.
+  useEffect(() => {
+    const upcoming = [
+      ...state.left.slice(1, 4),
+      ...state.right.slice(1, 4),
+      state.stack[0]?.[0],
+      state.stack[1]?.[0],
+    ].filter(Boolean);
+
+    const seen = new Set();
+    upcoming.forEach((m) => {
+      if (seen.has(m.id) || !m.imageUrl) return;
+      seen.add(m.id);
+      const img = new Image();
+      img.decoding = "async";
+      img.src = m.imageUrl;
+    });
+  }, [state.left, state.right, state.stack]);
+
   // Animate card swap when the pair changes
   const pairKey = `${state.left[0]?.id ?? ""}-${state.right[0]?.id ?? ""}`;
   useEffect(() => {
@@ -375,6 +397,15 @@ function HotkeyOverlay({ onClose, t }) {
 }
 
 function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
+  // Track per-member image-load state so the name and the photo can never
+  // appear out of sync. Re-keying on member.id forces a fresh <img> mount,
+  // and we hide it until decode completes (or errors out to the fallback).
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [member.id]);
+
   return (
     <div className="relative">
       <button
@@ -383,15 +414,33 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
         style={{ "--tilt": `${tilt}deg` }}
         aria-label={`Pick ${member.name}`}
       >
-        <img
-          src={member.imageUrl}
-          alt={member.name}
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
-          className="w-full h-[220px] sm:h-[300px] lg:h-[440px] object-cover bg-cream"
-        />
+        <div className="relative w-full h-[220px] sm:h-[300px] lg:h-[440px] bg-cream overflow-hidden">
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-cream">
+              <div className="flex gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-sakura-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: "120ms" }} />
+                <span className="w-2 h-2 rounded-full bg-sakura-400 animate-bounce" style={{ animationDelay: "240ms" }} />
+              </div>
+            </div>
+          )}
+          <img
+            key={member.id}
+            src={member.imageUrl}
+            alt={member.name}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            onLoad={() => setLoaded(true)}
+            onError={(e) => {
+              if (e.target.src !== IMAGE_FALLBACK) e.target.src = IMAGE_FALLBACK;
+              setLoaded(true);
+            }}
+            className={`w-full h-full object-cover transition-opacity duration-200 ${
+              loaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        </div>
         <div className="absolute bottom-1 left-0 right-0 text-center px-2">
           <div className="font-kawaii font-bold text-base sm:text-lg text-ink truncate">
             {member.name}
