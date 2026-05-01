@@ -73,6 +73,12 @@ i18n.use(initReactI18next).init({
           notAvailable: "N/A",
         },
 
+        /* SHORT STATUS LABELS (status pills on Sorter cards) */
+        status: {
+          active: "Active",
+          graduated: "Graduated",
+        },
+
         /* RESULTS EXTRAS */
         top3Section: "Top 3 ⭐",
         fullList: "Full List",
@@ -276,6 +282,11 @@ i18n.use(initReactI18next).init({
           notAvailable: "无",
         },
 
+        status: {
+          active: "在籍",
+          graduated: "毕业",
+        },
+
         /* RESULTS EXTRAS */
         top3Section: "前三 ⭐",
         fullList: "完整列表",
@@ -474,6 +485,11 @@ i18n.use(initReactI18next).init({
           notAvailable: "Tiada",
         },
 
+        status: {
+          active: "Aktif",
+          graduated: "Tamat",
+        },
+
         /* RESULTS EXTRAS */
         top3Section: "Top 3 ⭐",
         fullList: "Senarai Penuh",
@@ -670,6 +686,11 @@ i18n.use(initReactI18next).init({
           activeBadge: "💚 現役",
           graduatedBadge: "🎓 卒業",
           notAvailable: "なし",
+        },
+
+        status: {
+          active: "現役",
+          graduated: "卒業",
         },
 
         /* RESULTS EXTRAS */

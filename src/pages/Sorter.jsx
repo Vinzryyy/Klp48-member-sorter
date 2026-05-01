@@ -417,19 +417,28 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
     }
   }, []);
 
+  const isActive = member.status === "active";
+
   return (
     <div className="relative">
       <button
         onClick={onPick}
-        className="polaroid w-full block focus:outline-none"
-        style={{ "--tilt": `${tilt}deg` }}
+        className="w-full block bg-white rounded-2xl border-[3px] border-ink shadow-[4px_4px_0_#064e3b] hover:-translate-y-1 active:translate-y-0 transition-transform p-2 sm:p-3 focus:outline-none focus:ring-4 focus:ring-sakura-300"
         aria-label={`Pick ${member.name}`}
       >
-        {/* Photo area uses aspect-[3/4] which matches typical portrait
-            member photos — that way object-cover fills the whole card
-            without cropping faces, and the photo (not empty cream space)
-            takes up every device's available card area. */}
-        <div className="relative w-full aspect-[3/4] bg-cream overflow-hidden">
+        {/* Generation tab — overhangs the top-left like the reference */}
+        <span
+          className={`absolute -top-2 left-3 z-10 ${
+            isActive ? "bg-emerald-500" : "bg-sakura-500"
+          } text-white text-[10px] sm:text-xs font-kawaii font-bold px-2.5 py-1 rounded-md border-[2px] border-ink shadow-[2px_2px_0_#064e3b]`}
+        >
+          Gen {member.generation}
+        </span>
+
+        {/* Photo — aspect-[3/4] matches portrait member photos so the
+            image fills the whole card area on every device. object-top
+            keeps the face anchored at the top of the frame. */}
+        <div className="relative w-full aspect-[3/4] bg-cream overflow-hidden rounded-xl">
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-cream">
               <div className="flex gap-1.5">
@@ -456,22 +465,30 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
             }`}
           />
         </div>
-        <div className="absolute bottom-1 left-0 right-0 text-center px-2">
-          <div className="font-kawaii font-bold text-base sm:text-lg text-ink truncate">
+
+        {/* Name + status — normal flow below the photo */}
+        <div className="pt-2.5 px-1 text-center space-y-1.5">
+          <div className="font-kawaii font-bold text-sm sm:text-base text-ink truncate">
             {member.name}
           </div>
-          <div className="font-script text-sm text-ink/60">
-            {t("generationLabel", { gen: member.generation })}
-          </div>
+          <span
+            className={`inline-block text-[10px] sm:text-xs font-kawaii font-bold uppercase tracking-wide px-3 py-0.5 rounded-full border-2 ${
+              isActive
+                ? "bg-emerald-50 text-emerald-700 border-emerald-500"
+                : "bg-sakura-50 text-sakura-700 border-sakura-500"
+            }`}
+          >
+            {isActive ? t("status.active") : t("status.graduated")}
+          </span>
         </div>
       </button>
 
       <button
         onClick={(e) => { e.stopPropagation(); onInfo(); }}
-        className="absolute top-3 right-3 z-20 p-2 bg-white border-2 border-ink rounded-full shadow-[2px_2px_0_#064e3b] text-ink hover:bg-sakura-100 transition"
+        className="absolute top-2 right-2 z-20 p-1.5 sm:p-2 bg-white border-2 border-ink rounded-full shadow-[2px_2px_0_#064e3b] text-ink hover:bg-sakura-100 transition"
         aria-label="Show profile"
       >
-        <Info className="w-4 h-4" />
+        <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
       </button>
     </div>
   );
