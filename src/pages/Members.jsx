@@ -182,7 +182,7 @@ export default function Members() {
                   {m.name}
                 </div>
                 <div className="font-script text-xs text-ink/60 truncate">
-                  Gen {m.generation}{m.status === "graduated" && " · 卒"}
+                  {t("membersPage.generation", { gen: m.generation })}{m.status === "graduated" && t("membersPage.graduatedShort")}
                 </div>
               </div>
             </button>
@@ -199,7 +199,7 @@ export default function Members() {
       </main>
 
       <footer className="relative z-10 mt-16 pb-6 text-center font-script text-base text-ink/60">
-        © 2026 <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
+        © {new Date().getFullYear()} <span className="font-kawaii font-bold text-emerald-600">Malvin Evano</span> · made with 💚 + 🌸
       </footer>
 
       <ProfileModal
