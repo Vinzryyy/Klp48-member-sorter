@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { gsap } from "gsap";
 
 /**
@@ -14,6 +15,7 @@ import { gsap } from "gsap";
  * shows for the minimum duration so it doesn't flash.
  */
 export default function Preloader({ ready = true, onDone }) {
+  const { t } = useTranslation();
   const root = useRef(null);
   const word = useRef(null);
   const bar = useRef(null);
@@ -131,7 +133,7 @@ export default function Preloader({ ready = true, onDone }) {
       <div className="pre-content relative z-10 flex flex-col items-center gap-6 px-6 text-center">
 
         {/* Sparkle accent */}
-        <div className="font-script text-2xl text-sakura-600">welcome ♡</div>
+        <div className="font-script text-2xl text-sakura-600">{t("preloader.welcome")}</div>
 
         {/* Word with per-letter spans */}
         <h1
@@ -156,7 +158,7 @@ export default function Preloader({ ready = true, onDone }) {
         </h1>
 
         <p className="pre-sub font-script text-lg text-ink/60">
-          loading your oshi…
+          {t("preloader.loading")}
         </p>
 
         {/* Bouncing dots */}
