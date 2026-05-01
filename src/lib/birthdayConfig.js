@@ -26,11 +26,11 @@ const THEMES = {
     surprisePrefix: "🥔",
     tagline: "for {{name}}, our potato queen 🥔",
     photos: [
-      "/Alice Birthday pic/Alice1.png",
-      "/Alice Birthday pic/Alice2.png",
-      "/Alice Birthday pic/Alice3.png",
-      "/Alice Birthday pic/Alice4.png",
-      "/Alice Birthday pic/Alice5.png",
+      "/Alice Birthday pic/Alice1.jpg",
+      "/Alice Birthday pic/Alice2.jpg",
+      "/Alice Birthday pic/Alice3.jpg",
+      "/Alice Birthday pic/Alice4.jpg",
+      "/Alice Birthday pic/Alice5.jpg",
     ],
     // Floating decorative icons for the background layer.
     floatingIcons: ["🥔", "🌷", "✨", "💛", "🌸", "🥔", "📚", "🎀"],

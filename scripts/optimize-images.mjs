@@ -7,9 +7,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const publicDir = path.join(root, "public");
 const membersDir = path.join(publicDir, "members");
+const birthdayDir = path.join(publicDir, "Alice Birthday pic");
 
 const MEMBER_MAX_WIDTH = 800;
 const MEMBER_QUALITY = 75;
+const GALLERY_MAX_WIDTH = 1000;
+const GALLERY_QUALITY = 80;
 
 const fmt = (bytes) => (bytes / 1024).toFixed(0) + " KB";
 
@@ -27,6 +30,36 @@ async function compressMember(file) {
   await fs.writeFile(full, out);
   const after = out.length;
   return { file, before, after };
+}
+
+// Birthday-gallery photos are solid photographs that were saved as PNG.
+// Convert them to JPEG (no alpha to preserve) for ~20× savings, deleting
+// the original .png. Returns {file, before, after} per processed image.
+async function compressGalleryPhoto(file) {
+  const full = path.join(birthdayDir, file);
+  const before = (await fs.stat(full)).size;
+  const buf = await fs.readFile(full);
+
+  const ext = path.extname(file).toLowerCase();
+  const baseName = path.basename(file, ext);
+  const outName = `${baseName}.jpg`;
+  const outFull = path.join(birthdayDir, outName);
+
+  const outBuf = await sharp(buf)
+    .rotate()
+    .resize({ width: GALLERY_MAX_WIDTH, withoutEnlargement: true })
+    .jpeg({ quality: GALLERY_QUALITY, mozjpeg: true, progressive: true })
+    .toBuffer();
+
+  await fs.writeFile(outFull, outBuf);
+
+  // If the source was a different extension (e.g. .png), remove the
+  // original so the directory only holds the optimized .jpg.
+  if (outFull !== full) {
+    await fs.unlink(full);
+  }
+
+  return { file, outFile: outName, before, after: outBuf.length };
 }
 
 async function buildFavicon() {
@@ -80,6 +113,30 @@ async function main() {
   }
   console.log(`  ----`);
   console.log(`  total            ${fmt(totalBefore).padStart(8)} → ${fmt(totalAfter).padStart(7)}  (-${((1 - totalAfter / totalBefore) * 100).toFixed(0)}%)`);
+
+  console.log("\n== Compressing birthday gallery photos ==");
+  try {
+    const galleryFiles = (await fs.readdir(birthdayDir)).filter((f) =>
+      /\.(jpe?g|png)$/i.test(f)
+    );
+    let gBefore = 0;
+    let gAfter = 0;
+    for (const f of galleryFiles) {
+      const r = await compressGalleryPhoto(f);
+      gBefore += r.before;
+      gAfter += r.after;
+      const pct = ((1 - r.after / r.before) * 100).toFixed(0);
+      const arrow = r.file === r.outFile ? r.file : `${r.file} → ${r.outFile}`;
+      console.log(`  ${arrow.padEnd(28)} ${fmt(r.before).padStart(8)} → ${fmt(r.after).padStart(7)}  (-${pct}%)`);
+    }
+    if (galleryFiles.length) {
+      console.log(`  ----`);
+      console.log(`  total                        ${fmt(gBefore).padStart(8)} → ${fmt(gAfter).padStart(7)}  (-${((1 - gAfter / gBefore) * 100).toFixed(0)}%)`);
+    }
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+    console.log("  (no gallery directory, skipping)");
+  }
 
   console.log("\n== Generating favicon + OG image ==");
   const favicon = await buildFavicon();
