@@ -214,21 +214,24 @@ export default function Home() {
             <span className="hidden sm:inline truncate">KLP48 Sorter</span>
           </Link>
 
-          {/* Members + Birthday nav */}
+          {/* Members + Birthday nav — labels shown from md+ so two pills
+              don't overflow the 3-column grid cell on small tablets. */}
           <div className="flex justify-center items-center min-w-0 gap-2">
             <Link
               to="/members"
-              className="btn-pop bg-sakura-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full"
+              className="btn-pop bg-sakura-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs md:text-sm px-3 md:px-4 py-2 rounded-full"
+              aria-label="Members"
             >
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Members</span>
+              <span className="hidden md:inline">Members</span>
             </Link>
             <Link
               to="/birthday"
-              className="btn-pop bg-emerald-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-full"
+              className="btn-pop bg-emerald-100 text-ink font-kawaii font-bold flex items-center gap-1.5 text-xs md:text-sm px-3 md:px-4 py-2 rounded-full"
+              aria-label={t("birthday.headerTitle")}
             >
               <Cake className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("birthday.headerTitle")}</span>
+              <span className="hidden md:inline">{t("birthday.headerTitle")}</span>
             </Link>
           </div>
 
