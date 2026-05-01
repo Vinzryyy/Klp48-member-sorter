@@ -32,8 +32,6 @@ export default function Gift() {
   const { t } = useTranslation();
   const { memberId } = useParams();
   const stageRef = useRef(null);
-  const [giftOpen, setGiftOpen] = useState(false);
-  const [confettiBurst, setConfettiBurst] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Honoree resolution:
@@ -94,14 +92,11 @@ export default function Gift() {
   const theme = honoree ? getMemberTheme(honoree.id) : getMemberTheme(null);
   const palette = PALETTE_CLASSES[theme.palette] ?? PALETTE_CLASSES.default;
 
-  const handleGiftTap = () => {
-    setGiftOpen((v) => !v);
-    setConfettiBurst((n) => n + 1);
-  };
-
-  // Tapping the cake (or the gift box's outer wrapper) launches the
-  // big celebration popup — fullscreen gift box, falling confetti, big
-  // happy birthday message.
+  // Tapping the cake or the gift box launches the big celebration popup
+  // — fullscreen gift box, falling confetti, big happy birthday message.
+  // The in-page gift box is presentation-only; the modal IS the gimmick,
+  // so we don't toggle local "open" state on tap (otherwise the page's
+  // gift would stay visually opened after the modal closes).
   const handleCelebrationLaunch = () => setShowCelebration(true);
 
   const honoreeName = honoree?.nickname || honoree?.name;
@@ -231,12 +226,9 @@ export default function Gift() {
 
           <div className="gift-box-stage flex flex-col items-center">
             <GiftBox
-              open={giftOpen}
-              onTap={() => {
-                handleGiftTap();
-                handleCelebrationLaunch();
-              }}
-              burstKey={confettiBurst}
+              open={false}
+              onTap={handleCelebrationLaunch}
+              burstKey={0}
               t={t}
               honoreeName={honoreeName}
               palette={palette}
