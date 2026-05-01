@@ -417,6 +417,8 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
     }
   }, []);
 
+  const isActive = member.status === "active";
+
   return (
     <div className="relative">
       <button
@@ -425,7 +427,13 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
         style={{ "--tilt": `${tilt}deg` }}
         aria-label={`Pick ${member.name}`}
       >
-        <div className="relative w-full h-[260px] sm:h-[320px] lg:h-[440px] bg-cream overflow-hidden">
+        {/* Generation badge — anchored to top-left of the polaroid */}
+        <span className="absolute top-2 left-2 z-10 bg-emerald-500 text-white text-[10px] sm:text-xs font-kawaii font-bold px-2.5 py-0.5 rounded-full border-2 border-ink shadow-[2px_2px_0_#064e3b]">
+          Gen {member.generation}
+        </span>
+
+        {/* Photo — full image visible (object-contain) on a cream background */}
+        <div className="relative w-full h-[260px] sm:h-[320px] lg:h-[440px] bg-cream overflow-hidden rounded-md">
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-cream">
               <div className="flex gap-1.5">
@@ -452,13 +460,21 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
             }`}
           />
         </div>
-        <div className="absolute bottom-1 left-0 right-0 text-center px-2">
-          <div className="font-kawaii font-bold text-base sm:text-lg text-ink truncate">
+
+        {/* Name + status — normal flow below the photo so they never overlap */}
+        <div className="pt-2 pb-1 px-1 text-center space-y-1.5">
+          <div className="font-kawaii font-bold text-sm sm:text-base text-ink truncate">
             {member.name}
           </div>
-          <div className="font-script text-sm text-ink/60">
-            {t("generationLabel", { gen: member.generation })}
-          </div>
+          <span
+            className={`inline-block text-[10px] sm:text-xs font-kawaii font-bold px-2.5 py-0.5 rounded-full border-2 ${
+              isActive
+                ? "bg-emerald-100 text-emerald-700 border-emerald-600"
+                : "bg-sakura-100 text-sakura-700 border-sakura-500"
+            }`}
+          >
+            {isActive ? t("active") : t("graduated")}
+          </span>
         </div>
       </button>
 
