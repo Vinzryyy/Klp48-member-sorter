@@ -1,9 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Instagram, Calendar, Heart, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const IMAGE_FALLBACK = "https://placehold.co/400x600?text=KLP48";
 
 export default function ProfileModal({ member, isOpen, onClose }) {
+  const { t } = useTranslation();
   if (!member) return null;
 
   return (
@@ -35,7 +37,7 @@ export default function ProfileModal({ member, isOpen, onClose }) {
             <button
               onClick={onClose}
               className="absolute top-4 right-4 z-30 p-2 bg-white border-2 border-ink rounded-full shadow-[2px_2px_0_#064e3b] text-ink hover:bg-sakura-100 transition"
-              aria-label="Close"
+              aria-label={t("profile.close")}
             >
               <X className="w-4 h-4" />
             </button>
@@ -68,9 +70,9 @@ export default function ProfileModal({ member, isOpen, onClose }) {
                 </div>
 
                 <div className="space-y-2.5 text-sm font-sans">
-                  <InfoRow icon={Star}     label="Nickname"   value={member.nickname || member.name} />
-                  <InfoRow icon={Calendar} label="Birth Date" value={member.birthDate || "N/A"} />
-                  <InfoRow icon={Heart}    label="Hobbies"    value={member.hobbies || "N/A"} />
+                  <InfoRow icon={Star}     label={t("profile.nickname")}   value={member.nickname || member.name} />
+                  <InfoRow icon={Calendar} label={t("profile.birthDate")}  value={member.birthDate || t("profile.notAvailable")} />
+                  <InfoRow icon={Heart}    label={t("profile.hobbies")}    value={member.hobbies || t("profile.notAvailable")} />
 
                   {member.instagram && (
                     <a
@@ -87,12 +89,12 @@ export default function ProfileModal({ member, isOpen, onClose }) {
 
                 <div className="flex flex-wrap gap-2 pt-1">
                   <span className="sticker bg-white px-3 py-1 rounded-full text-xs font-kawaii font-bold text-emerald-700">
-                    Gen {member.generation}
+                    {t("generationLabel", { gen: member.generation })}
                   </span>
                   <span className={`sticker-pink bg-white px-3 py-1 rounded-full text-xs font-kawaii font-bold ${
                     member.status === "active" ? "text-emerald-700" : "text-ink/60"
                   }`}>
-                    {member.status === "active" ? "💚 Active" : "🎓 Graduated"}
+                    {member.status === "active" ? t("profile.activeBadge") : t("profile.graduatedBadge")}
                   </span>
                 </div>
               </div>
@@ -104,7 +106,7 @@ export default function ProfileModal({ member, isOpen, onClose }) {
                 onClick={onClose}
                 className="btn-pop w-full bg-white py-2.5 rounded-full font-kawaii font-bold text-ink"
               >
-                Close
+                {t("profile.close")}
               </button>
             </div>
           </motion.div>
