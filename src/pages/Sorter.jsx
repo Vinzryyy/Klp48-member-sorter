@@ -435,12 +435,14 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
           Gen {member.generation}
         </span>
 
-        {/* Photo — aspect-[3/4] matches portrait member photos so the
-            image fills the whole card area on every device. object-top
-            keeps the face anchored at the top of the frame. */}
-        <div className="relative w-full aspect-[3/4] bg-cream overflow-hidden rounded-xl">
+        {/* Photo — object-contain shows the WHOLE member. The source
+            photos are clean studio shots with a white background so we
+            give the container a white bg too — the photo blends in
+            seamlessly with no visible letterbox edge. aspect-[4/5]
+            matches the typical headshot proportion closely. */}
+        <div className="relative w-full aspect-[4/5] bg-white overflow-hidden rounded-xl">
           {!loaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-cream">
+            <div className="absolute inset-0 flex items-center justify-center bg-white">
               <div className="flex gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-sakura-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: "120ms" }} />
@@ -460,7 +462,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
               if (e.target.src !== IMAGE_FALLBACK) e.target.src = IMAGE_FALLBACK;
               setLoaded(true);
             }}
-            className={`w-full h-full object-cover object-top transition-opacity duration-200 ${
+            className={`w-full h-full object-contain bg-white transition-opacity duration-200 ${
               loaded ? "opacity-100" : "opacity-0"
             }`}
           />
