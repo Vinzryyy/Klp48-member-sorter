@@ -47,7 +47,7 @@ export default function Home() {
     if (reduced) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "power3.out", clearProps: "transform" } });
 
       tl.from(".hero-greet", { y: 16, opacity: 0, duration: 0.5 })
         .from(".hero-title .letter", {

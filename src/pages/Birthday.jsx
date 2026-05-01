@@ -136,7 +136,7 @@ export default function Birthday() {
     if (reduced) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "power3.out", clearProps: "transform" } });
       tl.from(".bday-greet", { y: 14, opacity: 0, duration: 0.5 })
         .from(".bday-title .letter", {
           y: 50, opacity: 0, rotate: -6,

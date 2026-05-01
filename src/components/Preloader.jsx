@@ -38,7 +38,10 @@ export default function Preloader({ ready = true, onDone }) {
     const ctx = gsap.context(() => {
       const letters = word.current.querySelectorAll(".letter");
 
-      const tl = gsap.timeline({ onComplete: () => setIntroDone(true) });
+      const tl = gsap.timeline({
+        onComplete: () => setIntroDone(true),
+        defaults: { clearProps: "transform" },
+      });
 
       tl.from(letters, {
         y: 60,

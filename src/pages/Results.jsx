@@ -66,7 +66,7 @@ export default function Results() {
     if (reduced || !stageRef.current) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "power3.out", clearProps: "transform" } });
       tl.from(".results-greet", { y: 14, opacity: 0, duration: 0.5 })
         .from(".results-title .letter", {
           y: 50, opacity: 0, rotate: -6,
@@ -85,7 +85,7 @@ export default function Results() {
 
     const ctx = gsap.context(() => {
       if (view === "ranking") {
-        const tl = gsap.timeline({ defaults: { ease: "back.out(1.4)" } });
+        const tl = gsap.timeline({ defaults: { ease: "back.out(1.4)", clearProps: "transform" } });
         tl.fromTo(
           ".podium-card",
           { y: 80, opacity: 0, rotate: 0, scale: 0.85 },
@@ -100,7 +100,7 @@ export default function Results() {
         gsap.fromTo(
           ".tier-row",
           { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power3.out" }
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power3.out", clearProps: "transform" }
         );
       }
     }, stageRef);

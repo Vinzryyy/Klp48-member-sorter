@@ -36,7 +36,7 @@ export default function Members() {
     if (reduced) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "power3.out", clearProps: "transform" } });
       tl.from(headerRef.current, { y: -30, opacity: 0, duration: 0.6 })
         .from(controlsRef.current, { y: 30, opacity: 0, duration: 0.6 }, "-=0.3");
     });
@@ -72,6 +72,7 @@ export default function Members() {
         duration: 0.45,
         ease: "back.out(1.4)",
         stagger: { amount: Math.min(0.6, cards.length * 0.025) },
+        clearProps: "transform",
       }
     );
   }, [filtered]);

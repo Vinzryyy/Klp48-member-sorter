@@ -15,7 +15,7 @@ export function useGsapTimeline(factory, deps = []) {
       return;
     }
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({ defaults: { clearProps: "transform" } });
       factory(tl, ref.current);
     }, ref);
     return () => ctx.revert();
