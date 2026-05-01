@@ -447,7 +447,7 @@ function ComparisonCard({ member, tilt, onPick, onInfo, t }) {
               if (e.target.src !== IMAGE_FALLBACK) e.target.src = IMAGE_FALLBACK;
               setLoaded(true);
             }}
-            className={`w-full h-full object-cover object-top transition-opacity duration-200 ${
+            className={`w-full h-full object-contain bg-cream transition-opacity duration-200 ${
               loaded ? "opacity-100" : "opacity-0"
             }`}
           />
