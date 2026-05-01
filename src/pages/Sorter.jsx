@@ -433,12 +433,12 @@ function ComparisonCard({ member, onPick, onInfo, t }) {
           Gen {member.generation}
         </span>
 
-        {/* Photo — object-contain shows the WHOLE member. The source
-            photos are clean studio shots with a white background so we
-            give the container a white bg too — the photo blends in
-            seamlessly with no visible letterbox edge. aspect-[4/5]
-            matches the typical headshot proportion closely. */}
-        <div className="relative w-full aspect-[4/5] bg-white overflow-hidden rounded-xl">
+        {/* Photo — the source headshots are roughly square (1:1), so we
+            use aspect-square here. Combined with object-contain on a
+            white background, the photo fills the container with no
+            crop and no visible letterbox edge — the bow at the top of
+            the head and the shoulders at the bottom are both visible. */}
+        <div className="relative w-full aspect-square bg-white overflow-hidden rounded-xl">
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
               <div className="flex gap-1.5">
