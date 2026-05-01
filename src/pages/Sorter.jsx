@@ -263,7 +263,7 @@ export default function Sorter() {
         </div>
 
         {/* COMPARISON GRID */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 items-stretch">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-6 items-stretch">
 
           {/* LEFT CARD */}
           <div className="sorter-left order-1">
