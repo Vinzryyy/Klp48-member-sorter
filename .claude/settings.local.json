@@ -8,7 +8,20 @@
       "Bash(npm run *)",
       "Bash(node -e ' *)",
       "Bash(pnpm --version)",
-      "Bash(pnpm install *)"
+      "Bash(pnpm install *)",
+      "Bash(pnpm run *)",
+      "Read(//d/d/New folder \\(2\\)/Klp48-member-sorter/src/data/**)",
+      "Bash(npx vite *)",
+      "WebFetch(domain:x.com)",
+      "Bash(npx eslint *)",
+      "Bash(npx vitest *)",
+      "Bash(node -e \"import\\('node:fs'\\).then\\(fs => { const f = fs.readFileSync\\('./public/members/Alice.jpg'\\); const w = f.readUInt16BE\\(165\\); const h = f.readUInt16BE\\(163\\); console.log\\('Alice.jpg dims:', w, 'x', h, 'aspect:', \\(w/h\\).toFixed\\(3\\)\\); }\\)\")",
+      "Bash(pnpm add *)",
+      "Bash(pnpm optimize-images *)",
+      "Bash(pnpm build *)",
+      "Bash(git restore *)",
+      "WebSearch",
+      "Bash(npx --no-install gifsicle --version)"
     ]
   }
 }

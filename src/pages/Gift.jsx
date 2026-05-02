@@ -139,7 +139,7 @@ export default function Gift() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-4">
 
         <section className="text-center space-y-4 mb-8">
-          <div className="gift-greet inline-block font-script text-xl sm:text-2xl text-sakura-600 -rotate-3">
+          <div className={`gift-greet inline-block font-script text-xl sm:text-2xl ${palette.softAccent} -rotate-3`}>
             {t("gift.greet")}
           </div>
           <h1 className="gift-title font-kawaii font-bold leading-[0.95] text-4xl sm:text-6xl xl:text-7xl tracking-tight">
@@ -171,7 +171,7 @@ export default function Gift() {
               </div>
 
               <div className="flex-1 text-center sm:text-left min-w-0">
-                <div className="font-script text-base text-sakura-600 mb-1">
+                <div className={`font-script text-base ${palette.softAccent} mb-1`}>
                   {t("gift.forCaption")}
                 </div>
                 <div className={`font-kawaii font-bold ${palette.accentText} text-2xl sm:text-3xl truncate`}>
@@ -187,6 +187,14 @@ export default function Gift() {
             </div>
           </div>
         )}
+
+        {/* FAVE CHARACTERS — anime/game characters the honoree posts about. */}
+        <FavoriteCharacters
+          favorites={theme.favorites}
+          palette={palette}
+          t={t}
+          honoreeName={honoreeName}
+        />
 
         {/* PHOTO GALLERY — only renders for members with custom theme photos */}
         {theme.photos && theme.photos.length > 0 && (
@@ -234,7 +242,7 @@ export default function Gift() {
               palette={palette}
               theme={theme}
             />
-            <p className="mt-6 font-kawaii font-bold text-sakura-700 text-center">
+            <p className={`mt-6 font-kawaii font-bold ${palette.accentText} text-center`}>
               <Sparkles className="w-4 h-4 inline mr-1" />
               {t("gift.celebration.giftHint")}
             </p>
@@ -246,6 +254,7 @@ export default function Gift() {
             <CelebrationModal
               honoreeName={honoreeName}
               theme={theme}
+              palette={palette}
               t={t}
               onClose={() => setShowCelebration(false)}
             />
@@ -256,6 +265,7 @@ export default function Gift() {
           <section className="gift-dev-msg mt-16 max-w-2xl mx-auto">
             <DevMessageCard
               theme={theme}
+              palette={palette}
               honoreeName={honoreeName}
               t={t}
             />
@@ -364,9 +374,90 @@ function FloatingLucideIcons({ palette }) {
   );
 }
 
+/* ------------------------- FAVE CHARACTERS -------------------------- */
+
+function FavoriteCharacters({ favorites, palette, t, honoreeName }) {
+  if (!favorites || favorites.length === 0) return null;
+
+  // Adapt the polaroid grid columns to the count so 5 doesn't end up with
+  // a lonely card on its own row.
+  const gridCols =
+    favorites.length >= 5
+      ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+      : favorites.length === 4
+      ? "grid-cols-2 sm:grid-cols-4"
+      : "grid-cols-2 sm:grid-cols-3";
+
+  return (
+    <section className="gift-faves max-w-4xl mx-auto mb-16 relative pt-10">
+      {/* Wrapping-paper backdrop: diagonal candy stripes with ink border + drop shadow.
+          Sits behind the inner white card to read as a gift box. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 rounded-[2rem] border-[3px] border-ink shadow-[6px_6px_0_#064e3b] overflow-hidden"
+        style={{ backgroundImage: palette.wrapPaper }}
+      />
+
+      {/* Bow at the top center — same shape language as the page's GiftBox */}
+      <div aria-hidden="true" className="absolute -top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+        <div className="relative">
+          <div className={`absolute -left-7 top-2 w-10 h-12 ${palette.giftBow} border-[3px] border-ink rounded-full transform -rotate-12 shadow-[3px_3px_0_#064e3b]`} />
+          <div className={`absolute -right-7 top-2 w-10 h-12 ${palette.giftBow} border-[3px] border-ink rounded-full transform rotate-12 shadow-[3px_3px_0_#064e3b]`} />
+          <div className={`relative w-9 h-9 ${palette.giftBowCenter} border-[3px] border-ink rounded-md mx-auto shadow-[3px_3px_0_#064e3b]`} />
+        </div>
+      </div>
+
+      {/* Gift tag — paper with twine, hand-tied to the corner. */}
+      <div className="absolute top-3 right-4 sm:right-6 z-20 -rotate-6">
+        <div className="bg-white border-[2px] border-ink shadow-[2px_2px_0_#064e3b] px-3 py-1 rounded-md font-script text-xs sm:text-sm text-ink whitespace-nowrap">
+          {t("gift.faves.toTag", { name: honoreeName ?? "" })}
+        </div>
+      </div>
+
+      {/* Inner card — the unwrapped contents */}
+      <div className="relative bg-white rounded-[1.5rem] m-3 sm:m-4 p-5 sm:p-7 border-[3px] border-ink">
+        <div className="washi-tape -top-3 left-12 transform -rotate-6" />
+        <div className="washi-tape -top-3 right-12 transform rotate-3" />
+
+        <div className="text-center mb-5">
+          <h2 className={`font-kawaii font-bold text-2xl sm:text-3xl ${palette.accentText}`}>
+            ✨ {t("gift.faves.heading", { name: honoreeName ?? "" })} ✨
+          </h2>
+          <p className={`font-script text-base sm:text-lg ${palette.softAccent} italic mt-1`}>
+            {t("gift.faves.subline")}
+          </p>
+        </div>
+
+        <div className={`grid ${gridCols} gap-4 sm:gap-5`}>
+          {favorites.map((fav, i) => (
+            <div
+              key={fav.src}
+              className="polaroid w-full"
+              style={{ "--tilt": `${(i % 2 === 0 ? -1 : 1) * (2 + (i % 3))}deg` }}
+            >
+              <img
+                src={fav.src}
+                alt={fav.name}
+                loading="lazy"
+                decoding="async"
+                onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
+                className="w-full aspect-[3/4] object-contain bg-cream"
+              />
+              <div className="absolute bottom-1 left-0 right-0 text-center font-script text-sm text-ink truncate px-2">
+                {fav.name}
+                {fav.source ? <span className="text-ink/60"> · {fav.source}</span> : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ------------------------- DEVELOPER MESSAGE ------------------------- */
 
-function DevMessageCard({ theme, honoreeName, t }) {
+function DevMessageCard({ theme, palette, honoreeName, t }) {
   const reduced = useReducedMotion();
   const key = theme?.devMessageKey ?? "default";
   const title = t(`gift.devMessage.${key}.title`, {
@@ -405,7 +496,7 @@ function DevMessageCard({ theme, honoreeName, t }) {
         >
           ✉️
         </motion.span>
-        <h3 className="font-kawaii font-bold text-lg sm:text-xl text-emerald-700">
+        <h3 className={`font-kawaii font-bold text-lg sm:text-xl ${palette.devTitle}`}>
           {title}
         </h3>
       </div>
@@ -421,17 +512,17 @@ function DevMessageCard({ theme, honoreeName, t }) {
             animate={heartAnim}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
           >
-            💚
+            {theme?.devHearts?.[0] ?? "💚"}
           </motion.span>
           <motion.span
             className="text-xl"
             animate={heartAnim}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
           >
-            🌸
+            {theme?.devHearts?.[1] ?? "🌸"}
           </motion.span>
         </div>
-        <div className="font-script text-base sm:text-lg text-sakura-600 italic">
+        <div className={`font-script text-base sm:text-lg ${palette.softAccent} italic`}>
           — {signoff}
         </div>
       </div>
@@ -456,6 +547,9 @@ function BirthdayCake({ nickname, palette, theme }) {
   const candles = [0, 1, 2];
   const topDeco = theme?.decoCake ?? ["🌸", "🍓", "🌸"];
   const bottomDeco = theme?.decoBottom ?? ["💚", "🌸", "✨", "💚", "🌸"];
+  // Lollipop "candles" replace wax candles for candy-themed members.
+  const useLollipops = theme?.candleType === "lollipop";
+  const lollipopEmojis = ["🍭", "🍬", "🍭"];
   const flameAnim = reduced
     ? {}
     : {
@@ -463,38 +557,70 @@ function BirthdayCake({ nickname, palette, theme }) {
         scaleX: [1, 0.85, 1.12, 0.92, 1],
         rotate: [-2, 3, -1, 2, -2],
       };
+  const lollipopAnim = reduced ? {} : { rotate: [-6, 6, -4, 4, -6], y: [0, -3, 0, -2, 0] };
 
   return (
     <div className="flex flex-col items-center select-none">
 
-      <div className="flex gap-5 mb-1 z-10">
-        {candles.map((i) => (
-          <div key={i} className="flex flex-col items-center">
+      {useLollipops ? (
+        <div className="flex gap-4 mb-1 z-10 items-end">
+          {lollipopEmojis.map((emoji, i) => (
             <motion.div
-              className="w-3 h-5 rounded-[50%] bg-gradient-to-b from-amber-200 via-amber-400 to-orange-500 will-change-transform"
-              style={{ boxShadow: "0 0 10px #fbbf24, 0 0 20px #f59e0b" }}
-              animate={flameAnim}
+              key={i}
+              className="text-[2.75rem] sm:text-5xl leading-none"
+              animate={lollipopAnim}
               transition={{
-                duration: 0.85 + i * 0.13,
+                duration: 2.4 + i * 0.3,
                 repeat: Infinity,
                 ease: "easeInOut",
+                delay: i * 0.15,
               }}
-            />
-            <div className="w-[2px] h-1 bg-ink" />
-            <div className={`w-2.5 h-12 bg-gradient-to-b ${palette.candleStick} border-2 border-ink rounded-sm relative`}>
-              <div className="absolute inset-x-0 top-1/3 h-[2px] bg-white/70" />
+              style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" }}
+            >
+              {emoji}
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex gap-5 mb-1 z-10">
+          {candles.map((i) => (
+            <div key={i} className="flex flex-col items-center">
+              <motion.div
+                className="w-3 h-5 rounded-[50%] bg-gradient-to-b from-amber-200 via-amber-400 to-orange-500 will-change-transform"
+                style={{ boxShadow: "0 0 10px #fbbf24, 0 0 20px #f59e0b" }}
+                animate={flameAnim}
+                transition={{
+                  duration: 0.85 + i * 0.13,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              <div className="w-[2px] h-1 bg-ink" />
+              <div className={`w-2.5 h-12 bg-gradient-to-b ${palette.candleStick} border-2 border-ink rounded-sm relative`}>
+                <div className="absolute inset-x-0 top-1/3 h-[2px] bg-white/70" />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      <div className={`relative w-44 h-16 bg-gradient-to-b ${palette.topTier} border-[3px] border-ink rounded-2xl shadow-[4px_4px_0_#064e3b]`}>
+      <div className={`relative w-48 sm:w-52 h-20 bg-gradient-to-b ${palette.topTier} border-[3px] border-ink rounded-2xl shadow-[4px_4px_0_#064e3b]`}>
+        {palette.topTierStripes && (
+          // Inner overlay clips its own stripes via overflow-hidden so the
+          // white pearl dots above/below the tier stay visible.
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none"
+          >
+            <div className="absolute inset-0" style={{ backgroundImage: palette.topTierStripes }} />
+          </div>
+        )}
         <div className="absolute -top-2 left-2 right-2 flex justify-between">
           {Array.from({ length: 7 }).map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full bg-white border-2 border-ink" />
           ))}
         </div>
-        <div className="absolute inset-0 flex items-center justify-evenly px-3 text-base">
+        <div className="absolute inset-0 flex items-center justify-evenly px-3 text-lg">
           {topDeco.map((e, i) => <span key={i}>{e}</span>)}
         </div>
         <div className="absolute -bottom-2 left-0 right-0 flex justify-around">
@@ -506,13 +632,21 @@ function BirthdayCake({ nickname, palette, theme }) {
 
       <div className="h-2" />
 
-      <div className={`relative w-60 h-32 bg-gradient-to-b ${palette.bottomTier} border-[3px] border-ink rounded-2xl shadow-[5px_5px_0_#064e3b]`}>
+      <div className={`relative w-64 sm:w-72 h-36 bg-gradient-to-b ${palette.bottomTier} border-[3px] border-ink rounded-2xl shadow-[5px_5px_0_#064e3b]`}>
+        {palette.bottomTierStripes && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none"
+          >
+            <div className="absolute inset-0" style={{ backgroundImage: palette.bottomTierStripes }} />
+          </div>
+        )}
         <div className="absolute -top-2 left-2 right-2 flex justify-between">
           {Array.from({ length: 9 }).map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full bg-white border-2 border-ink" />
           ))}
         </div>
-        <div className="absolute inset-0 flex items-center justify-evenly px-4 text-xl">
+        <div className="absolute inset-0 flex items-center justify-evenly px-4 text-2xl">
           {bottomDeco.map((e, i) => <span key={i}>{e}</span>)}
         </div>
         <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 font-script text-xs ${palette.bannerText} whitespace-nowrap max-w-[14rem] truncate px-2`}>
@@ -520,14 +654,22 @@ function BirthdayCake({ nickname, palette, theme }) {
         </div>
       </div>
 
-      <div className={`w-72 h-3 ${palette.plate} border-[3px] border-ink rounded-full shadow-[3px_3px_0_#064e3b] mt-1`} />
+      <div className="relative">
+        <div className={`w-80 h-3 ${palette.plate} border-[3px] border-ink rounded-full shadow-[3px_3px_0_#064e3b] mt-1`} />
+        {useLollipops && (
+          <>
+            <span aria-hidden="true" className="absolute -left-1 -top-4 text-2xl select-none">🍬</span>
+            <span aria-hidden="true" className="absolute -right-1 -top-4 text-2xl select-none">🍡</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
 /* ------------------------------- GIFT -------------------------------- */
 
-function GiftBox({ open, onTap, burstKey, t, honoreeName, theme }) {
+function GiftBox({ open, onTap, burstKey, t, honoreeName, theme, palette }) {
   const surprisePrefix = theme?.surprisePrefix ?? "💌";
 
   return (
@@ -542,27 +684,27 @@ function GiftBox({ open, onTap, burstKey, t, honoreeName, theme }) {
         transition={{ type: "spring", stiffness: 220, damping: 16 }}
       >
         <div className="relative">
-          <div className="absolute -left-6 top-2 w-8 h-10 bg-sakura-400 border-[3px] border-ink rounded-full transform -rotate-12" />
-          <div className="absolute -right-6 top-2 w-8 h-10 bg-sakura-400 border-[3px] border-ink rounded-full transform rotate-12" />
-          <div className="relative w-8 h-8 bg-sakura-500 border-[3px] border-ink rounded-md mx-auto" />
+          <div className={`absolute -left-6 top-2 w-8 h-10 ${palette.giftBow} border-[3px] border-ink rounded-full transform -rotate-12`} />
+          <div className={`absolute -right-6 top-2 w-8 h-10 ${palette.giftBow} border-[3px] border-ink rounded-full transform rotate-12`} />
+          <div className={`relative w-8 h-8 ${palette.giftBowCenter} border-[3px] border-ink rounded-md mx-auto`} />
         </div>
       </motion.div>
 
       <motion.div
-        className="absolute left-0 right-0 top-12 h-12 mx-2 bg-sakura-300 border-[3px] border-ink rounded-lg shadow-[4px_4px_0_#064e3b] z-20"
+        className={`absolute left-0 right-0 top-12 h-12 mx-2 ${palette.giftLid} border-[3px] border-ink rounded-lg shadow-[4px_4px_0_#064e3b] z-20`}
         animate={open ? { y: -50, rotate: -10, opacity: 0.95 } : { y: 0, rotate: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 14 }}
       >
-        <div className="absolute left-1/2 -translate-x-1/2 -top-1 w-6 h-3 bg-sakura-500 border-[3px] border-ink rounded-sm" />
+        <div className={`absolute left-1/2 -translate-x-1/2 -top-1 w-6 h-3 ${palette.giftLidKnot} border-[3px] border-ink rounded-sm`} />
       </motion.div>
 
       <motion.div
-        className="absolute left-2 right-2 top-24 bottom-2 bg-gradient-to-b from-sakura-200 to-sakura-300 border-[3px] border-ink rounded-2xl shadow-[5px_5px_0_#064e3b] z-10 overflow-hidden"
+        className={`absolute left-2 right-2 top-24 bottom-2 bg-gradient-to-b ${palette.giftBody} border-[3px] border-ink rounded-2xl shadow-[5px_5px_0_#064e3b] z-10 overflow-hidden`}
         animate={open ? { scale: 1.02 } : { scale: 1 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-6 bg-sakura-500 border-x-[3px] border-ink" />
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-6 bg-sakura-500 border-y-[3px] border-ink" />
+        <div className={`absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-6 ${palette.giftRibbon} border-x-[3px] border-ink`} />
+        <div className={`absolute top-1/2 -translate-y-1/2 left-0 right-0 h-6 ${palette.giftRibbon} border-y-[3px] border-ink`} />
       </motion.div>
 
       <AnimatePresence>
@@ -576,7 +718,7 @@ function GiftBox({ open, onTap, burstKey, t, honoreeName, theme }) {
             className="absolute left-1/2 -translate-x-1/2 top-6 z-30 flex flex-col items-center"
           >
             <span className="text-5xl">{surprisePrefix}</span>
-            <span className="mt-1 font-kawaii font-bold text-sakura-700 text-sm bg-white px-3 py-1 border-2 border-ink rounded-full shadow-[2px_2px_0_#be185d] max-w-[14rem] truncate">
+            <span className={`mt-1 font-kawaii font-bold ${palette.accentText} text-sm bg-white px-3 py-1 border-2 border-ink rounded-full shadow-[2px_2px_0_#be185d] max-w-[14rem] truncate`}>
               {honoreeName
                 ? t("birthday.giftSurpriseNamed", { name: honoreeName })
                 : t("birthday.giftSurprise")}
@@ -594,7 +736,7 @@ function GiftBox({ open, onTap, burstKey, t, honoreeName, theme }) {
 
 /* ---------------------- CELEBRATION POPUP MODAL ---------------------- */
 
-function CelebrationModal({ honoreeName, theme, t, onClose }) {
+function CelebrationModal({ honoreeName, theme, palette, t, onClose }) {
   // Auto-stage the animation: gift starts closed, opens after a short
   // delay, then the message + falling confetti continue while the user
   // takes it in. Close button + backdrop click both dismiss.
@@ -622,6 +764,8 @@ function CelebrationModal({ honoreeName, theme, t, onClose }) {
   const surprisePool =
     theme?.palette === "potato"
       ? ["🥔", "💛", "✨", "🎉", "🌷", "🥔", "💌", "🌟"]
+      : theme?.palette === "gulagula"
+      ? ["🍬", "🍭", "🧁", "🍡", "💗", "✨", "🎉", "🩷"]
       : ["🌸", "💚", "✨", "🎉", "💌", "🍀", "🎀", "🌟"];
 
   return (
@@ -667,7 +811,7 @@ function CelebrationModal({ honoreeName, theme, t, onClose }) {
         transition={{ type: "spring", stiffness: 200, damping: 18 }}
         className="relative w-full max-w-md flex flex-col items-center"
       >
-        <BigGiftBox opened={opened} />
+        <BigGiftBox opened={opened} palette={palette} theme={theme} />
 
         <AnimatePresence>
           {opened && (
@@ -695,7 +839,7 @@ function CelebrationModal({ honoreeName, theme, t, onClose }) {
                 transition={{ delay: 0.5, duration: 0.4 }}
                 className="mt-6 btn-pop bg-white text-ink font-kawaii font-bold px-6 py-3 rounded-full text-sm sm:text-base shadow-[4px_4px_0_#064e3b] border-[3px] border-ink"
               >
-                💚 {t("gift.celebration.thanks")}
+                {theme?.devHearts?.[0] ?? "💚"} {t("gift.celebration.thanks")}
               </motion.button>
 
               {/* Center burst confetti — fired once on open */}
@@ -709,13 +853,14 @@ function CelebrationModal({ honoreeName, theme, t, onClose }) {
   );
 }
 
-function BigGiftBox({ opened }) {
+function BigGiftBox({ opened, palette, theme }) {
+  const reveal = theme?.giftBoxReveal;
   return (
     <div className="relative w-64 h-64 sm:w-72 sm:h-72">
 
       {/* Glow halo behind the box */}
       <motion.div
-        className="absolute inset-0 rounded-full bg-sakura-300/60 blur-3xl"
+        className={`absolute inset-0 rounded-full ${palette.giftHalo} blur-3xl`}
         animate={opened
           ? { scale: [1, 1.5, 1.3], opacity: [0.6, 0.9, 0.7] }
           : { scale: 1, opacity: 0.4 }}
@@ -731,34 +876,35 @@ function BigGiftBox({ opened }) {
         transition={{ type: "spring", stiffness: 220, damping: 15 }}
       >
         <div className="relative">
-          <div className="absolute -left-9 top-3 w-12 h-14 bg-sakura-400 border-[3px] border-ink rounded-full transform -rotate-12 shadow-[3px_3px_0_#be185d]" />
-          <div className="absolute -right-9 top-3 w-12 h-14 bg-sakura-400 border-[3px] border-ink rounded-full transform rotate-12 shadow-[3px_3px_0_#be185d]" />
-          <div className="relative w-10 h-10 bg-sakura-500 border-[3px] border-ink rounded-md mx-auto shadow-[3px_3px_0_#be185d]" />
+          <div className={`absolute -left-9 top-3 w-12 h-14 ${palette.giftBow} border-[3px] border-ink rounded-full transform -rotate-12 shadow-[3px_3px_0_#be185d]`} />
+          <div className={`absolute -right-9 top-3 w-12 h-14 ${palette.giftBow} border-[3px] border-ink rounded-full transform rotate-12 shadow-[3px_3px_0_#be185d]`} />
+          <div className={`relative w-10 h-10 ${palette.giftBowCenter} border-[3px] border-ink rounded-md mx-auto shadow-[3px_3px_0_#be185d]`} />
         </div>
       </motion.div>
 
       {/* Lid */}
       <motion.div
-        className="absolute left-0 right-0 top-14 h-16 mx-2 bg-sakura-300 border-[3px] border-ink rounded-lg shadow-[5px_5px_0_#064e3b] z-20"
+        className={`absolute left-0 right-0 top-14 h-16 mx-2 ${palette.giftLid} border-[3px] border-ink rounded-lg shadow-[5px_5px_0_#064e3b] z-20`}
         animate={opened
           ? { y: -80, rotate: -14, opacity: 0.95 }
           : { y: 0, rotate: 0 }}
         transition={{ type: "spring", stiffness: 180, damping: 14 }}
       >
-        <div className="absolute left-1/2 -translate-x-1/2 -top-1 w-8 h-4 bg-sakura-500 border-[3px] border-ink rounded-sm" />
+        <div className={`absolute left-1/2 -translate-x-1/2 -top-1 w-8 h-4 ${palette.giftLidKnot} border-[3px] border-ink rounded-sm`} />
       </motion.div>
 
       {/* Box body */}
       <motion.div
-        className="absolute left-2 right-2 top-28 bottom-2 bg-gradient-to-b from-sakura-200 to-sakura-300 border-[3px] border-ink rounded-3xl shadow-[6px_6px_0_#064e3b] z-10 overflow-hidden"
+        className={`absolute left-2 right-2 top-28 bottom-2 bg-gradient-to-b ${palette.giftBody} border-[3px] border-ink rounded-3xl shadow-[6px_6px_0_#064e3b] z-10 overflow-hidden`}
         animate={opened ? { scale: 1.04 } : { scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-8 bg-sakura-500 border-x-[3px] border-ink" />
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-8 bg-sakura-500 border-y-[3px] border-ink" />
+        <div className={`absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-8 ${palette.giftRibbon} border-x-[3px] border-ink`} />
+        <div className={`absolute top-1/2 -translate-y-1/2 left-0 right-0 h-8 ${palette.giftRibbon} border-y-[3px] border-ink`} />
       </motion.div>
 
-      {/* Surprise popping out */}
+      {/* Surprise popping out — a themed image (e.g. fan-art GIF) when
+          theme.giftBoxReveal is set, otherwise the default 🎁 emoji. */}
       <AnimatePresence>
         {opened && (
           <motion.div
@@ -767,9 +913,22 @@ function BigGiftBox({ opened }) {
             animate={{ y: -30, scale: 1.1, opacity: 1 }}
             exit={{ y: 90, scale: 0.4, opacity: 0 }}
             transition={{ type: "spring", stiffness: 240, damping: 14, delay: 0.15 }}
-            className="absolute left-1/2 -translate-x-1/2 top-2 z-40"
+            className="absolute left-1/2 -translate-x-1/2 -top-12 sm:-top-16 z-40"
           >
-            <div className="text-7xl sm:text-8xl drop-shadow-[3px_3px_0_#be185d]">🎁</div>
+            {reveal ? (
+              <div className="polaroid w-44 sm:w-52" style={{ "--tilt": "-3deg" }}>
+                <img
+                  src={reveal}
+                  alt="surprise"
+                  loading="eager"
+                  decoding="async"
+                  onError={(e) => { e.target.src = IMAGE_FALLBACK; }}
+                  className="w-full aspect-[5/3] object-contain bg-cream"
+                />
+              </div>
+            ) : (
+              <div className="text-7xl sm:text-8xl drop-shadow-[3px_3px_0_#be185d]">🎁</div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -838,6 +997,8 @@ function ConfettiBurst({ theme }) {
     const pool =
       theme?.palette === "potato"
         ? ["🥔", "💛", "✨", "🎉", "🌷", "🥔"]
+        : theme?.palette === "gulagula"
+        ? ["🍬", "🍭", "🧁", "🍡", "💗", "✨"]
         : ["🌸", "💚", "✨", "🎉", "💌", "🍀"];
     return Array.from({ length: 18 }).map((_, i) => ({
       id: i,

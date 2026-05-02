@@ -196,6 +196,11 @@ i18n.use(initReactI18next).init({
           subtitle: "A little cake and a little surprise — just for them 🎁",
           forCaption: "celebrating",
           honoreeTagline: "for {{name}}, with love",
+          faves: {
+            heading: "{{name}}'s faves",
+            subline: "her current obsessions ✨",
+            toTag: "to: {{name}} ♡",
+          },
           celebration: {
             cakeAria: "Tap the cake to celebrate",
             cakeHint: "Tap the cake to make a wish",
@@ -216,6 +221,11 @@ i18n.use(initReactI18next).init({
               title: "A potato-coded note for Alice 🥔",
               body: "Happy birthday, Alice! 🥔🎂\nNo one rocks a potato photoshoot quite like you do — earthy, soft, and a little bit silly in the best way. Thank you for the scripts you write, the anime nights you talk about, and the way you turn a brown backdrop into a whole vibe.\nMay your 22nd be full of warm books, golden tubers, sweet music, and people who see how special you are. Stay weird, stay you, stay our potato queen 🌷",
               signoff: "the developer 💚🥔",
+            },
+            kei: {
+              title: "A sweet note for our gula-gula 🍬",
+              body: "Happy birthday, Kei! 🍬🎂\nYou are KLP48's gula-gula — sweet, bright, and a little bit chaotic in the most delightful way. Thank you for the doodles, the tween-by-tween animations, the crocheted everything, and the loud cheerful energy you bring to gen 2.\nMay your 16th be full of fresh sketchbooks, soft yarn, comics that make you cry happy tears, naps with no alarms, and sweets in every flavour. Stay loud, stay sleepy, stay our gula-gula 🍭",
+              signoff: "the developer 💚🍬",
             },
           },
         },
@@ -399,6 +409,11 @@ i18n.use(initReactI18next).init({
           subtitle: "一点蛋糕，一点惊喜 — 只为她 🎁",
           forCaption: "庆祝",
           honoreeTagline: "送给 {{name}}，满载爱意",
+          faves: {
+            heading: "{{name}} 的最爱",
+            subline: "她最近迷上的角色 ✨",
+            toTag: "给 {{name}} ♡",
+          },
           celebration: {
             cakeAria: "点击蛋糕来庆祝",
             cakeHint: "点击蛋糕，许下心愿",
@@ -419,6 +434,11 @@ i18n.use(initReactI18next).init({
               title: "致 Alice 的小土豆来信 🥔",
               body: "Alice，生日快乐！🥔🎂\n没人能像你一样，把土豆写真拍得这么好看 —— 朴实、柔软、又带点可爱的傻气。谢谢你写过的剧本、聊过的动漫之夜，以及把一块棕色背景拍成整个氛围的能力。\n愿你的22岁充满温暖的书本、金色的土豆、甜美的音乐，和真心懂你特别之处的人。继续做奇怪的、独特的、属于我们的土豆女王 🌷",
               signoff: "开发者 💚🥔",
+            },
+            kei: {
+              title: "致 Kei 的甜甜来信 🍬",
+              body: "Kei，生日快乐！🍬🎂\n你就是 KLP48 的 gula-gula —— 甜甜的、亮晶晶的，又带着一点最讨人喜欢的小混乱。谢谢你画过的小涂鸦、一帧一帧的动画实验、各种钩织作品，以及你为二期生带来的那股响亮又开朗的能量。\n愿你的 16 岁充满崭新的画本、柔软的毛线、看到流泪的漫画、不用闹钟的午睡，和各种口味的甜食。保持响亮、保持爱睡、保持我们的 gula-gula 🍭",
+              signoff: "开发者 💚🍬",
             },
           },
         },
@@ -602,6 +622,11 @@ i18n.use(initReactI18next).init({
           subtitle: "Sedikit kek dan sedikit kejutan — khas untuk mereka 🎁",
           forCaption: "meraikan",
           honoreeTagline: "untuk {{name}}, dengan kasih",
+          faves: {
+            heading: "Pilihan {{name}}",
+            subline: "obsesi terbarunya ✨",
+            toTag: "untuk: {{name}} ♡",
+          },
           celebration: {
             cakeAria: "Tekan kek untuk meraikan",
             cakeHint: "Tekan kek untuk buat hajat",
@@ -622,6 +647,11 @@ i18n.use(initReactI18next).init({
               title: "Nota berbau ubi untuk Alice 🥔",
               body: "Selamat hari lahir, Alice! 🥔🎂\nTiada siapa boleh menjayakan photoshoot ubi seperti kau — warna tanah, lembut, dan sedikit kelakar dengan cara yang paling comel. Terima kasih untuk skrip yang kau tulis, malam anime yang kau ceritakan, dan kebolehan menjadikan latar coklat sebagai satu mood.\nSemoga ulang tahun ke-22 ini penuh dengan buku hangat, ubi keemasan, muzik manis, dan orang yang nampak betapa istimewanya kau. Kekal pelik, kekal kau, kekal ratu ubi kami 🌷",
               signoff: "pembangun 💚🥔",
+            },
+            kei: {
+              title: "Nota manis untuk gula-gula kami 🍬",
+              body: "Selamat hari lahir, Kei! 🍬🎂\nKau ialah gula-gula KLP48 — manis, terang, dan sedikit huru-hara dengan cara yang paling comel. Terima kasih untuk semua coretan, eksperimen animasi tween demi tween, kraf kait, dan tenaga kuat-ceria yang kau bawa kepada gen 2.\nSemoga ulang tahun ke-16 ini penuh dengan buku lakaran baharu, benang lembut, komik yang buat menangis gembira, tidur tanpa alarm, dan gula-gula segala perisa. Kekal kuat, kekal mengantuk, kekal gula-gula kami 🍭",
+              signoff: "pembangun 💚🍬",
             },
           },
         },
@@ -805,6 +835,11 @@ i18n.use(initReactI18next).init({
           subtitle: "ちょっとしたケーキと、ちょっとしたサプライズ 🎁",
           forCaption: "お祝い",
           honoreeTagline: "{{name}} へ、愛をこめて",
+          faves: {
+            heading: "{{name}} の推し",
+            subline: "今ハマってる子たち ✨",
+            toTag: "{{name}} へ ♡",
+          },
           celebration: {
             cakeAria: "ケーキをタップしてお祝い",
             cakeHint: "ケーキをタップして願いごとを",
@@ -825,6 +860,11 @@ i18n.use(initReactI18next).init({
               title: "Alice へ、ポテトな手紙 🥔",
               body: "Alice、お誕生日おめでとう！🥔🎂\nあなたほどポテトの撮影を着こなせる人はいません — 素朴で、優しくて、ちょっぴりお茶目で、最高の雰囲気。書いてくれる脚本、語ってくれるアニメの夜、茶色い背景ひとつを物語に変えるその力に、いつも感謝しています。\n22歳が、温かい本と金色のじゃがいもと甘い音楽、そしてあなたの特別さをちゃんと見てくれる人たちで満たされますように。あなたらしく、ちょっと変で、私たちのポテトクイーンでいてください 🌷",
               signoff: "開発者 💚🥔",
+            },
+            kei: {
+              title: "Kei へ、甘〜い手紙 🍬",
+              body: "Kei、お誕生日おめでとう！🍬🎂\nあなたは KLP48 の gula-gula（あめちゃん）— 甘くて、まぶしくて、ちょっぴりにぎやかで、その全部がたまらなく愛おしい。落書き、コマ送りのアニメ実験、編み物のあれこれ、そして 2期生に持ち込んでくれる元気いっぱいの声に、いつもありがとう。\n16歳が、まっさらなスケッチブックと、ふわふわの毛糸と、泣けちゃう漫画と、目覚ましのいらないお昼寝と、いろんな味のお菓子で溢れますように。元気で、眠たがりで、私たちの gula-gula のままでいてね 🍭",
+              signoff: "開発者 💚🍬",
             },
           },
         },
